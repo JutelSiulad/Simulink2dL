@@ -85,12 +85,12 @@ public class MultiPortSwitchTransformer extends BlockTransformer {
 			Conjunction testPorti;
 			if(i<numPorts-1) {
 				testPorti = new Conjunction(
-								new Relation(new RealTerm(i-1), Relation.RelationType.LESS_EQUAL, controlPortReplaceable),
-								new Relation(controlPortReplaceable, Relation.RelationType.LESS_THAN, new RealTerm(i))); 
+								new Relation(new RealTerm(i), Relation.RelationType.GREATER_THAN, controlPortReplaceable),
+								new Relation(controlPortReplaceable, Relation.RelationType.GREATER_EQUAL, new RealTerm(i-1))); 
 			}
 			else {
 				testPorti = new Conjunction(
-								new Relation(new RealTerm(i-1), Relation.RelationType.LESS_EQUAL, controlPortReplaceable));
+								new Relation(controlPortReplaceable, Relation.RelationType.GREATER_EQUAL, new RealTerm(i-1)));
 			}
 			
 			
