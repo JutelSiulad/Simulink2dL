@@ -29,31 +29,39 @@
 package simulink2dl.transform.blocktransformer;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.conqat.lib.simulink.model.SimulinkBlock;
 import org.conqat.lib.simulink.model.SimulinkModel;
+import org.conqat.lib.simulink.model.SimulinkOutPort;
 
 import simulink2dl.dlmodel.elements.Constant;
+import simulink2dl.dlmodel.elements.Variable;
+import simulink2dl.dlmodel.operator.formula.Conjunction;
+import simulink2dl.dlmodel.operator.formula.Relation;
+import simulink2dl.dlmodel.term.AdditionTerm;
+import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.dlmodel.term.RealTerm;
+import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
 import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.macro.ConditionalMacro;
 import simulink2dl.transform.macro.Macro;
+import simulink2dl.transform.macro.MacroContainer;
 import simulink2dl.transform.macro.SimpleMacro;
-import simulink2dl.transform.macro.VectorMacro;
-import simulink2dl.util.PluginLogger;
-import simulink2dl.util.parser.StringParser;
 
-public class ConstantTransformer extends BlockTransformer {
+public class MultiPortSwitchTransformer extends BlockTransformer {
 
-	public ConstantTransformer(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
+	public MultiPortSwitchTransformer(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 
 	@Override
 	public void transformBlock(SimulinkBlock block) {
 		List<Macro> macros = createMacro(block);
+		// add alternative to model
 		for (Macro macro : macros) {
 			dlModel.addMacro(macro);
 		}
@@ -62,34 +70,40 @@ public class ConstantTransformer extends BlockTransformer {
 	@Override
 	public List<Macro> createMacro(SimulinkBlock block) {
 		List<Macro> macros = new ArrayList<>();
-		String type = "Constant";
+		String type = "Switch";
 		checkBlock(type, block);
 
-		// get constant string
-		String valueString = block.getParameter("Value");
+		int numPorts = block.getInPorts().size();
 		
-		if (StringParser.isScalar(valueString)) {
-			Term replaceWith = StringParser.parseScalarToTerm(valueString);
-			if(replaceWith instanceof Constant) {
-				dlModel.addConstant((Constant)replaceWith);
-			}
-			macros.add(new SimpleMacro(environment.getToReplace(block), replaceWith));
+		SimulinkOutPort controlPort = environment.getConnectedOuputPort(block, 1);//get control signal
+		String controlPortId = environment.getPortID(controlPort);
+		Term controlPortReplaceable = new PortIdentifier(controlPortId);
+		LinkedList<MacroContainer> cases = new LinkedList<MacroContainer>();
 		
-		} else if (StringParser.isVector(valueString)) {
-			// add vector macro
-			VectorMacro vectorMacro = new VectorMacro(environment.getToReplace(block));
-
-			List<Double> vectorElements = StringParser.parseVector(valueString);
-			for (Double element : vectorElements) {
-				vectorMacro.addElement(new RealTerm(element));
+		for(int i = 1; i<numPorts; i++) {
+			//get switch condition for port i
+			Conjunction testPorti;
+			if(i<numPorts-1) {
+				testPorti = new Conjunction(
+								new Relation(new RealTerm(i-1), Relation.RelationType.LESS_EQUAL, controlPortReplaceable),
+								new Relation(controlPortReplaceable, Relation.RelationType.LESS_THAN, new RealTerm(i))); 
 			}
-
-			macros.add(vectorMacro);
-		} else {
-			PluginLogger.error("Constant of the following form is not handled: " + valueString);
+			else {
+				testPorti = new Conjunction(
+								new Relation(new RealTerm(i-1), Relation.RelationType.LESS_EQUAL, controlPortReplaceable));
+			}
+			
+			
+			//handle data port i
+			SimulinkOutPort dataPorti = environment.getConnectedOuputPort(block, i+1);//get data port
+			String dataPortiId = environment.getPortID(dataPorti);
+			
+			SimpleMacro macroPorti = new SimpleMacro(environment.getToReplace(block), new PortIdentifier(dataPortiId));
+			MacroContainer macroContaineri = new MacroContainer(macroPorti, testPorti, null);
+			cases.add(macroContaineri);
 		}
 
+		macros.add(new ConditionalMacro(environment.getToReplace(block), cases));
 		return macros;
 	}
-
 }

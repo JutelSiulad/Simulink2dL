@@ -36,6 +36,7 @@ import org.conqat.lib.simulink.model.SimulinkBlock;
 import org.conqat.lib.simulink.model.SimulinkModel;
 import org.conqat.lib.simulink.model.SimulinkOutPort;
 
+import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.ContinuousEvolution;
 import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
@@ -147,9 +148,14 @@ public class IntegratorTransformer extends BlockTransformer {
 			
 			if (upperLimit != null && !upperLimit.equals("inf")) {
 				// handle upper limit
-				double upperLimitInt = StringParser.parseScalar(upperLimit);
-				Formula greaterEqualUpperLimit = new Relation(variable, RelationType.GREATER_EQUAL,new RealTerm(upperLimitInt));
-				Formula lessEqualUpperLimit = new Relation(variable, RelationType.LESS_EQUAL,new RealTerm(upperLimitInt));
+				
+				Term upperLimitTerm = StringParser.parseScalarToTerm(upperLimit);
+				if(upperLimitTerm instanceof Constant) {
+					dlModel.addConstant((Constant)upperLimitTerm);
+				}
+				
+				Formula greaterEqualUpperLimit = new Relation(variable, RelationType.GREATER_EQUAL, upperLimitTerm);
+				Formula lessEqualUpperLimit = new Relation(variable, RelationType.LESS_EQUAL, upperLimitTerm);
 
 				ContinuousEvolution upperEvolution = new ContinuousEvolution(new SingleEvolution(variable, new RealTerm(0.0)));
 				// set upper evolution domain
@@ -166,9 +172,12 @@ public class IntegratorTransformer extends BlockTransformer {
 			}
 			if (lowerLimit != null && !lowerLimit.equals("-inf")) {
 				// handle lower limit
-				double lowerLimitInt = StringParser.parseScalar(lowerLimit);
-				Formula lessEqualLowerLimit = new Relation(variable, RelationType.LESS_EQUAL,new RealTerm(lowerLimitInt));
-				Formula greaterEqualLowerLimit = new Relation(variable, RelationType.GREATER_EQUAL,new RealTerm(lowerLimitInt));
+				Term lowerLimitTerm = StringParser.parseScalarToTerm(lowerLimit);
+				if(lowerLimitTerm instanceof Constant) {
+					dlModel.addConstant((Constant)lowerLimitTerm);
+				}
+				Formula lessEqualLowerLimit = new Relation(variable, RelationType.LESS_EQUAL, lowerLimitTerm);
+				Formula greaterEqualLowerLimit = new Relation(variable, RelationType.GREATER_EQUAL, lowerLimitTerm);
 
 				ContinuousEvolution lowerEvolution = new ContinuousEvolution(new SingleEvolution(variable, new RealTerm(0.0)));
 				

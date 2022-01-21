@@ -74,7 +74,12 @@ public class ConditionalMacro extends Macro {
 			this.macroContainers.add(newContainer);
 		}
 	}
-
+	
+	public ConditionalMacro(ReplaceableTerm toReplace, List<MacroContainer> macroContainers) {
+		this.toReplace = toReplace;
+		this.macroContainers = new LinkedList<MacroContainer>(macroContainers);
+	}
+	
 	public ReplaceableTerm getToReplace() {
 		return toReplace;
 	}

@@ -9,8 +9,8 @@ Require-Bundle: org.eclipse.ui.workbench,
  org.eclipse.equinox.registry,
  simulink2dl.dlmodel;bundle-version="1.0.0"
 Export-Package: simulink2dl.dlmodel.contracts,
- simulink2dl.dlmodel.contracts.helper,
- simulink2dl.dlmodel.contracts.helper.RL
+ simulink2dl.dlmodel.contracts.hardcoded,
+ simulink2dl.dlmodel.contracts.hardcoded.RLFactory
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.conqat.lib.simulink.model,
  simulink2dl.util

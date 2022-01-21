@@ -58,8 +58,9 @@ public class InportTransformer extends BlockTransformer {
 		String type = "Inport";
 		checkBlock(type, block);
 
+		String blockName =  block.getName().replace(" ", "");
 		// add variable
-		Variable variable = new Variable("R", block.getName());
+		Variable variable = new Variable("R", blockName);
 		dlModel.addVariable(variable);
 
 		// add macro
@@ -67,8 +68,8 @@ public class InportTransformer extends BlockTransformer {
 		dlModel.addMacro(new SimpleMacro(environment.getToReplace(block), replaceWith));
 
 		// add upper and lower limits
-		Constant upperLimit = new Constant("R", block.getName() + "UPPERLIMIT");
-		Constant lowerLimit = new Constant("R", block.getName() + "LOWERLIMIT");
+		Constant upperLimit = new Constant("R", blockName+"MAX");
+		Constant lowerLimit = new Constant("R", blockName+"MIN");
 		dlModel.addConstant(upperLimit);
 		dlModel.addConstant(lowerLimit);
 

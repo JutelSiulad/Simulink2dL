@@ -45,6 +45,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.conqat.lib.simulink.builder,
  simulink2dl.dlmodel.contracts,
- simulink2dl.dlmodel.contracts.helper,
- simulink2dl.dlmodel.contracts.helper.RL,
+ simulink2dl.dlmodel.contracts.hardcoded,
+ simulink2dl.dlmodel.contracts.hardcoded.RLFactory,
  simulink2dl.transform.config

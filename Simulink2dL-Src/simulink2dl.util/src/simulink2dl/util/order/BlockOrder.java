@@ -28,6 +28,9 @@
  ******************************************************************************/
 package simulink2dl.util.order;
 
+import java.text.Collator;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,15 +64,33 @@ public class BlockOrder {
 	 * @param unmodifiableCollection
 	 * @param Array                  to return the unsorted blocks
 	 * @return
+	 * TODO this needs rework
 	 */
 	public List<SimulinkBlock> generateBlockOrder(UnmodifiableCollection<SimulinkBlock> unmodifiableCollection,
 			Set<SimulinkBlock> unsortedBlocks) {
+		
+		// blocks are for some reason sometimes parsed in different order - sort by name to ease debugging
+		List<SimulinkBlock> blocksSortedByNames = new LinkedList<SimulinkBlock>(unmodifiableCollection);
+		Collections.sort(blocksSortedByNames, new Comparator<SimulinkBlock>() {
+			@Override
+			public int compare(SimulinkBlock o1, SimulinkBlock o2) {
+				return Collator.getInstance().compare(o1.getName(),o2.getName());
+			}
+		});
+		
+		// start generating block order
 		Set<SimulinkBlock> unsorted = new HashSet<SimulinkBlock>();
 		Set<SimulinkBlock> unsortedRev = new HashSet<SimulinkBlock>();
 		List<SimulinkBlock> sorted = new LinkedList<SimulinkBlock>();
-
-		// start with source blocks without input
-		for (SimulinkBlock block : unmodifiableCollection) {
+		
+		for (SimulinkBlock block : blocksSortedByNames) {
+			//skip commented blocks
+			String commented = block.getParameter("Commented");
+			if(commented!=null && commented.equals("on")) {
+				continue;
+			}
+			
+			// start with source blocks without input			
 			if (block.getInPorts().isEmpty()) {
 				sorted.add(block);
 			} else {
@@ -118,6 +139,8 @@ public class BlockOrder {
 
 		boolean allPredeccesorsAvailable = true;
 		// every predecessor has to be checked
+		try {
+
 		for (int i = 0; i < block.getInPorts().size(); i++) {
 			SimulinkBlock srcBlock = block.getInLines().get(i).getSrcPort().getBlock();
 			// if srcblock is not in sorted AND is no "last Block"
@@ -126,6 +149,10 @@ public class BlockOrder {
 					allPredeccesorsAvailable = false;
 				}
 			}
+		}
+		
+		} catch (Exception e) {
+			System.out.print("");
 		}
 
 		return allPredeccesorsAvailable;

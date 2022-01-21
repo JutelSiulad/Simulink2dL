@@ -35,60 +35,58 @@ import org.conqat.lib.simulink.model.SimulinkBlock;
 import org.conqat.lib.simulink.model.SimulinkModel;
 
 import simulink2dl.dlmodel.elements.Constant;
-import simulink2dl.dlmodel.term.RealTerm;
+import simulink2dl.dlmodel.elements.Variable;
+import simulink2dl.dlmodel.hybridprogram.NondeterministicAssignment;
+import simulink2dl.dlmodel.hybridprogram.TestFormula;
+import simulink2dl.dlmodel.operator.formula.Conjunction;
+import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
 import simulink2dl.transform.dlmodel.DLModelSimulink;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
-import simulink2dl.transform.macro.VectorMacro;
 import simulink2dl.util.PluginLogger;
-import simulink2dl.util.parser.StringParser;
 
-public class ConstantTransformer extends BlockTransformer {
+public class FromWorkspaceTransformer extends BlockTransformer {
 
-	public ConstantTransformer(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
+	public FromWorkspaceTransformer(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 
 	@Override
 	public void transformBlock(SimulinkBlock block) {
-		List<Macro> macros = createMacro(block);
-		for (Macro macro : macros) {
-			dlModel.addMacro(macro);
-		}
+		// add variable
+		String variableName =  block.getParameter("VariableName");
+		
+		Variable variable = new Variable("R", variableName);
+		dlModel.addVariable(variable);
+
+		// add macro
+		Term replaceWith = variable;
+		dlModel.addMacro(new SimpleMacro(environment.getToReplace(block), replaceWith));
+
+		// add upper and lower limits
+		Constant upperLimit = new Constant("R", variableName+"MAX");
+		Constant lowerLimit = new Constant("R", variableName+"MIN");
+		dlModel.addConstant(upperLimit);
+		dlModel.addConstant(lowerLimit);
+
+		Conjunction limitFormula = new Conjunction();
+
+		limitFormula.addElement(new Relation(variable, Relation.RelationType.LESS_EQUAL, upperLimit));
+		limitFormula.addElement(new Relation(variable, Relation.RelationType.GREATER_EQUAL, lowerLimit));
+		dlModel.addInitialCondition(limitFormula);
+		dlModel.addBehaviorFront(new TestFormula(limitFormula));
+
+		// add nondeterministic assignment
+		dlModel.addBehaviorFront(new NondeterministicAssignment(variable));
 	}
 
 	@Override
 	public List<Macro> createMacro(SimulinkBlock block) {
+		// TODO Auto-generated method stub
 		List<Macro> macros = new ArrayList<>();
-		String type = "Constant";
-		checkBlock(type, block);
-
-		// get constant string
-		String valueString = block.getParameter("Value");
-		
-		if (StringParser.isScalar(valueString)) {
-			Term replaceWith = StringParser.parseScalarToTerm(valueString);
-			if(replaceWith instanceof Constant) {
-				dlModel.addConstant((Constant)replaceWith);
-			}
-			macros.add(new SimpleMacro(environment.getToReplace(block), replaceWith));
-		
-		} else if (StringParser.isVector(valueString)) {
-			// add vector macro
-			VectorMacro vectorMacro = new VectorMacro(environment.getToReplace(block));
-
-			List<Double> vectorElements = StringParser.parseVector(valueString);
-			for (Double element : vectorElements) {
-				vectorMacro.addElement(new RealTerm(element));
-			}
-
-			macros.add(vectorMacro);
-		} else {
-			PluginLogger.error("Constant of the following form is not handled: " + valueString);
-		}
-
+		PluginLogger.error("createMacro() is not yet implemented for " + this.getClass().getSimpleName());
 		return macros;
 	}
 

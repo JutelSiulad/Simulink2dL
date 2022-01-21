@@ -31,8 +31,22 @@ package simulink2dl.util.parser;
 import java.util.LinkedList;
 import java.util.List;
 
+import simulink2dl.dlmodel.elements.Constant;
+import simulink2dl.dlmodel.term.RealTerm;
+import simulink2dl.dlmodel.term.Term;
 public class StringParser {
 
+	public static Term parseScalarToTerm(String scalarString) {
+		Term parsedTerm = null;
+		// add macro
+		if(StringParser.isNumber(scalarString)){
+			parsedTerm = new RealTerm(StringParser.parseScalar(scalarString));
+		} else {
+			parsedTerm = new Constant("R",scalarString); //TODO check for valid names
+		}
+		return parsedTerm;
+	}
+	
 	public static double parseScalar(String scalarString) {
 		if (scalarString.contains("[")) {
 			scalarString = scalarString.replace("[", "");

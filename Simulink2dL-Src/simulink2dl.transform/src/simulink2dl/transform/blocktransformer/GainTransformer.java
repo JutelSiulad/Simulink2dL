@@ -35,6 +35,7 @@ import org.conqat.lib.simulink.model.SimulinkBlock;
 import org.conqat.lib.simulink.model.SimulinkModel;
 import org.conqat.lib.simulink.model.SimulinkOutPort;
 
+import simulink2dl.dlmodel.term.BracketTerm;
 import simulink2dl.dlmodel.term.MultiplicationTerm;
 import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
@@ -73,7 +74,7 @@ public class GainTransformer extends BlockTransformer {
 		String connectedPortID = environment.getPortID(connectedPort);
 
 		// add macro
-		Term replaceWith = new MultiplicationTerm(StringToTerm.parseString(gain), new PortIdentifier(connectedPortID));
+		Term replaceWith = new MultiplicationTerm(new BracketTerm(StringToTerm.parseString(gain)), new PortIdentifier(connectedPortID));
 		macros.add(new SimpleMacro(environment.getToReplace(block), replaceWith));
 		return macros;
 	}

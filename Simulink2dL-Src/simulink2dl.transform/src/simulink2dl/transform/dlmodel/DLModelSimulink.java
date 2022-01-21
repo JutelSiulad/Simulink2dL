@@ -46,6 +46,7 @@ import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.dlmodel.term.VectorTerm;
 import simulink2dl.transform.Environment;
+import simulink2dl.transform.macro.ConditionalMacro;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SizePropagationMacro;
 import simulink2dl.transform.model.ConcurrentContractBehavior;
@@ -230,6 +231,9 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 							innerMacro.getClass().toString().replace("class simulink2dl.transform.macro.",""));
 					PluginLogger.debug("\t<"+innerMacro.toString()+">" + " to " +"<"+outerMacro.toString()+">");
 					
+					if(innerMacro instanceof ConditionalMacro || outerMacro instanceof ConditionalMacro) {
+						System.out.print("");
+					}
 					// create and add new macros
 					Macro originalMacro = innerMacro.createDeepCopy();
 					List<Macro> newMacrosThisIteration = innerMacro.applyOtherMacro(outerMacro);
