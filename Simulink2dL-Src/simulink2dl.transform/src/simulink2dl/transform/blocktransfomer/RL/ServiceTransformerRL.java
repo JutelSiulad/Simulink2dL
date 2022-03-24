@@ -57,6 +57,11 @@ import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.RewardContract;
 import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.RobotRLAgentContract;
 import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.RobotSensorContractCreator;
 import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.VelocityAdjustorContract1;
+import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLPumpContract;
+import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLScopesContract;
+import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLWDistInFlowContract;
+import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLWaterDistAgentContract;
+import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLWaterDistInfoContract;
 import simulink2dl.transform.Environment;
 import simulink2dl.transform.blocktransformer.ServiceTransformer;
 import simulink2dl.transform.dlmodel.DLModelSimulink;
@@ -119,6 +124,16 @@ public class ServiceTransformerRL extends ServiceTransformer {
 			contracts.add(new EvasiveMoveChooserContract(serviceName));
 		} else if (serviceName.endsWith("RLInfo")) {
 			contracts.add(new RLInfoContract(serviceName));
+		} else if (serviceName.endsWith("Pump")) {
+			contracts.add(new RLPumpContract(serviceName));
+		} else if (serviceName.endsWith("WDistInfo")) {
+			contracts.add(new RLWaterDistInfoContract(serviceName));
+		} else if (serviceName.endsWith("WDistScopes")) {
+			contracts.add(new RLScopesContract(serviceName));
+		} else if (serviceName.endsWith("WDistAgent")) {
+			contracts.add(new RLWaterDistAgentContract(serviceName));
+		} else if (serviceName.endsWith("WDistInFlow")) {
+			contracts.add(new RLWDistInFlowContract(serviceName));
 		} else {
 			PluginLogger.error("No contract creation given for service type: " + serviceName);
 			return null;

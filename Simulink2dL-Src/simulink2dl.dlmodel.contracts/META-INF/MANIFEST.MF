@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.ui.workbench,
  simulink2dl.dlmodel;bundle-version="1.0.0"
 Export-Package: simulink2dl.dlmodel.contracts,
  simulink2dl.dlmodel.contracts.hardcoded,
- simulink2dl.dlmodel.contracts.hardcoded.RLFactory
+ simulink2dl.dlmodel.contracts.hardcoded.RLFactory,
+ simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.conqat.lib.simulink.model,
  simulink2dl.util

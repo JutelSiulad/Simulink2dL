@@ -35,6 +35,7 @@ import org.conqat.lib.simulink.model.SimulinkBlock;
 import org.conqat.lib.simulink.model.SimulinkModel;
 
 import simulink2dl.dlmodel.elements.Constant;
+import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
@@ -66,28 +67,41 @@ public class ConstantTransformer extends BlockTransformer {
 		checkBlock(type, block);
 
 		// get constant string
+		String name = block.getParameter("Name");
+		Constant constant = new Constant("Real", name);
+		dlModel.addConstant(constant);
+		
 		String valueString = block.getParameter("Value");
 		
-		if (StringParser.isScalar(valueString)) {
-			Term replaceWith = StringParser.parseScalarToTerm(valueString);
-			if(replaceWith instanceof Constant) {
-				dlModel.addConstant((Constant)replaceWith);
-			}
-			macros.add(new SimpleMacro(environment.getToReplace(block), replaceWith));
-		
-		} else if (StringParser.isVector(valueString)) {
-			// add vector macro
-			VectorMacro vectorMacro = new VectorMacro(environment.getToReplace(block));
-
-			List<Double> vectorElements = StringParser.parseVector(valueString);
-			for (Double element : vectorElements) {
-				vectorMacro.addElement(new RealTerm(element));
-			}
-
-			macros.add(vectorMacro);
+		if(StringParser.isNumber(valueString)) {
+			double val = StringParser.parseScalar(valueString);
+			dlModel.addInitialCondition(new Relation(constant, Relation.RelationType.EQUAL, new RealTerm(val)));
 		} else {
 			PluginLogger.error("Constant of the following form is not handled: " + valueString);
 		}
+		
+		macros.add(new SimpleMacro(environment.getToReplace(block), constant));
+		
+//		if (StringParser.isScalar(valueString)) {
+//			Term replaceWith = StringParser.parseScalarToTerm(valueString);
+//			if(replaceWith instanceof Constant) {
+//				dlModel.addConstant((Constant)replaceWith);
+//			}
+//			macros.add(new SimpleMacro(environment.getToReplace(block), replaceWith));
+//		
+//		} else if (StringParser.isVector(valueString)) {
+//			// add vector macro
+//			VectorMacro vectorMacro = new VectorMacro(environment.getToReplace(block));
+//
+//			List<Double> vectorElements = StringParser.parseVector(valueString);
+//			for (Double element : vectorElements) {
+//				vectorMacro.addElement(new RealTerm(element));
+//			}
+//
+//			macros.add(vectorMacro);
+//		} else {
+//			PluginLogger.error("Constant of the following form is not handled: " + valueString);
+//		}
 
 		return macros;
 	}

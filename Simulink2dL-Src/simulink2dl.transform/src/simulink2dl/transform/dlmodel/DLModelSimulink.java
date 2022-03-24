@@ -231,9 +231,6 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 							innerMacro.getClass().toString().replace("class simulink2dl.transform.macro.",""));
 					PluginLogger.debug("\t<"+innerMacro.toString()+">" + " to " +"<"+outerMacro.toString()+">");
 					
-					if(innerMacro instanceof ConditionalMacro || outerMacro instanceof ConditionalMacro) {
-						System.out.print("");
-					}
 					// create and add new macros
 					Macro originalMacro = innerMacro.createDeepCopy();
 					List<Macro> newMacrosThisIteration = innerMacro.applyOtherMacro(outerMacro);

@@ -47,4 +47,5 @@ Import-Package: org.conqat.lib.simulink.builder,
  simulink2dl.dlmodel.contracts,
  simulink2dl.dlmodel.contracts.hardcoded,
  simulink2dl.dlmodel.contracts.hardcoded.RLFactory,
+ simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution,
  simulink2dl.transform.config

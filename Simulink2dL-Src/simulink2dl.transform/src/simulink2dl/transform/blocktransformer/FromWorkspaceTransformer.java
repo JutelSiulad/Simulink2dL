@@ -56,7 +56,7 @@ public class FromWorkspaceTransformer extends BlockTransformer {
 	@Override
 	public void transformBlock(SimulinkBlock block) {
 		// add variable
-		String variableName =  block.getParameter("VariableName");
+		String variableName =  block.getParameter("Name");
 		
 		Variable variable = new Variable("R", variableName);
 		dlModel.addVariable(variable);
