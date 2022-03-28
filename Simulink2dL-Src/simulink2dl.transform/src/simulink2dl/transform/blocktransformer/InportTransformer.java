@@ -36,6 +36,7 @@ import org.conqat.lib.simulink.model.SimulinkModel;
 
 import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
+import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
 import simulink2dl.dlmodel.hybridprogram.NondeterministicAssignment;
 import simulink2dl.dlmodel.hybridprogram.TestFormula;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
@@ -52,36 +53,51 @@ public class InportTransformer extends BlockTransformer {
 	public InportTransformer(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
-
+	/**
+	 * Every Input is treated as potentially continous. Continous Inputs are captured by evaluating them after continuous evolutions.
+	 * This is inspired by "Tactical contract composition for hybrid system component verification" Müller et al. 2017
+	 * To model discretized inputs, we additionally introduce a "discretized" variable, which stores the input value before every loop iteration.
+	 * This results in the following structure of the transformed HP:
+	 * {
+	 * 	inputDiscrete:=input;
+	 * 	ctrl;
+	 * 	plant;
+	 * 	input:=*;
+	 * 	?(test formula on input);
+	 * }*
+	 */
 	@Override
 	public void transformBlock(SimulinkBlock block) {
 		String type = "Inport";
 		checkBlock(type, block);
 
 		String blockName =  block.getName().replace(" ", "");
-		// add variable
+		
+		// add discretized input and assign input value to discretized value
+		Variable discretizedVariable = new Variable("R", blockName+"Discrete");
 		Variable variable = new Variable("R", blockName);
+		dlModel.addToDiscreteInput(new DiscreteAssignment(discretizedVariable, variable));
+		dlModel.addVariable(discretizedVariable);
 		dlModel.addVariable(variable);
 
-		// add macro
-		Term replaceWith = variable;
+		// add macro for discretizedVariable
+		Term replaceWith = discretizedVariable;
 		dlModel.addMacro(new SimpleMacro(environment.getToReplace(block), replaceWith));
 
-		// add upper and lower limits
+		// generate and add limit formula
 		Constant upperLimit = new Constant("R", blockName+"MAX");
 		Constant lowerLimit = new Constant("R", blockName+"MIN");
 		dlModel.addConstant(upperLimit);
 		dlModel.addConstant(lowerLimit);
 
 		Conjunction limitFormula = new Conjunction();
-
 		limitFormula.addElement(new Relation(variable, Relation.RelationType.LESS_EQUAL, upperLimit));
 		limitFormula.addElement(new Relation(variable, Relation.RelationType.GREATER_EQUAL, lowerLimit));
 		dlModel.addInitialCondition(limitFormula);
-		dlModel.addBehaviorFront(new TestFormula(limitFormula));
-
-		// add nondeterministic assignment
-		dlModel.addBehaviorFront(new NondeterministicAssignment(variable));
+		
+		// add nondeterministic assignment for "continuous" input
+		dlModel.addToContinousInput(new NondeterministicAssignment(variable));
+		dlModel.addToContinousInput(new TestFormula(limitFormula));
 	}
 
 	@Override

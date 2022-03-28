@@ -38,7 +38,9 @@ import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
 import simulink2dl.dlmodel.hybridprogram.HybridProgram;
 import simulink2dl.dlmodel.hybridprogram.HybridProgramCollection;
+import simulink2dl.dlmodel.hybridprogram.NondeterministicAssignment;
 import simulink2dl.dlmodel.hybridprogram.SingleEvolution;
+import simulink2dl.dlmodel.hybridprogram.TestFormula;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Formula;
 import simulink2dl.dlmodel.operator.formula.Relation;
@@ -65,11 +67,15 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 	
 	private List<DiscreteBehavior> discreteBehaviors;
 	
+	private HybridProgramCollection discreteInputBehavior;
+	
 	private HybridProgramCollection discreteOutputBehavior;
 
 	private ContinuousEvolutionBehavior continuousBehavior;
 	
 	private HybridProgramCollection continousOutputBehavior;
+	
+	private HybridProgramCollection continuousInputBehavior;
 	
 	private ConcurrentContractBehavior concurrentContracts;
 	
@@ -91,9 +97,11 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 
 		this.unsortedOutpus = new HybridProgramCollection();
 		this.discreteBehaviors = new LinkedList<DiscreteBehavior>();
+		this.discreteInputBehavior = new HybridProgramCollection();
 		this.discreteOutputBehavior = new HybridProgramCollection();
 		this.continuousBehavior = new ContinuousEvolutionBehavior();
 		this.continousOutputBehavior = new HybridProgramCollection();
+		this.continuousInputBehavior = new HybridProgramCollection();
 		this.contractBehavior = new HybridProgramCollection();
 
 		this.contracts = new LinkedList<HybridContract>();
@@ -111,6 +119,14 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 
 	public void addOutput(HybridProgram output) {
 		unsortedOutpus.addElement(output);
+	}
+	
+	public void addContinousOutput(HybridProgram output) {
+		continousOutputBehavior.addElement(output);
+	}
+	
+	public void addDiscreteOutput(HybridProgram output) {
+		discreteOutputBehavior.addElement(output);
 	}
 	
 	public void addMacro(Macro newMacro) {
@@ -137,6 +153,8 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 	public void finalizeModel(Environment environment) {
 		finalizeMacros();
 
+		this.addBehavior(discreteInputBehavior);
+		
 		// handle all discrete behavior
 		for (DiscreteBehavior discreteBehavior : discreteBehaviors) {
 			discreteBehavior.addToModel(this);
@@ -158,6 +176,8 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 		
 		// add outputs influenced by continous behavior
 		this.addBehavior(continousOutputBehavior);
+		
+		this.addBehavior(continuousInputBehavior);
 
 		// expand HPs with Vectorterms
 		this.expandVectors();
@@ -223,9 +243,10 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 			// handle continuous behavior
 			macro.applyToContinuousBehavior(continuousBehavior);
 
-			// handle contract behavior
+			// apply to outputs
 			macro.applyToHybridProgramCollection(unsortedOutpus);
-			
+			macro.applyToHybridProgramCollection(continousOutputBehavior);
+			macro.applyToHybridProgramCollection(discreteOutputBehavior);
 		}
 	}
 	
@@ -434,6 +455,14 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 
 	public List<HybridContract> getRLContracts() {
 		return rLContracts;
+	}
+
+	public void addToDiscreteInput(HybridProgram inputProgram) {
+		discreteInputBehavior.addElement(inputProgram);
+	}
+
+	public void addToContinousInput(HybridProgram inputProgram) {
+		continuousInputBehavior.addElement(inputProgram);
 	}
 
 }
