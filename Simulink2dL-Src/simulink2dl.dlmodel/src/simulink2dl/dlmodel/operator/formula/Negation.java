@@ -28,6 +28,9 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.operator.formula;
 
+import java.util.List;
+
+import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.Operator;
 import simulink2dl.dlmodel.term.Term;
 
@@ -121,4 +124,8 @@ public class Negation implements Formula {
 		return this;
 	}
 
+	@Override
+	public void getVariables(List<Variable> vars) {
+		innerOperator.getVariables(vars);
+	}
 }

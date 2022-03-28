@@ -28,6 +28,9 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.operator.formula;
 
+import java.util.List;
+
+import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.term.Term;
 
 @Deprecated
@@ -97,5 +100,10 @@ public class StringFormula implements Formula {
 	@Override
 	public Negation createNegation() {
 		return new Negation(createDeepCopy());
+	}
+	
+	@Override
+	public void getVariables(List<Variable> vars) {
+		/* do nothing */
 	}
 }

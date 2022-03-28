@@ -31,6 +31,8 @@ package simulink2dl.dlmodel.term;
 import java.util.LinkedList;
 import java.util.List;
 
+import simulink2dl.dlmodel.elements.Variable;
+
 /**
  * @author nick
  *
@@ -255,6 +257,16 @@ public class MultiplicationTerm implements Term {
 		}
 
 		return result;
+	}
+
+	@Override
+	public void getVariables(List<Variable> vars) {
+		for (Term factor : factors) {
+			factor.getVariables(vars);
+		}
+		for (Term divisor : divisors) {
+			divisor.getVariables(vars);
+		}
 	}
 
 }

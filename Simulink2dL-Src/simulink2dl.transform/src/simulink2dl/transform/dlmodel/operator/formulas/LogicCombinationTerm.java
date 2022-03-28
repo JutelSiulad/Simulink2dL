@@ -28,6 +28,9 @@
  ******************************************************************************/
 package simulink2dl.transform.dlmodel.operator.formulas;
 
+import java.util.List;
+
+import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.Operator;
 import simulink2dl.dlmodel.operator.formula.Formula;
 import simulink2dl.dlmodel.operator.formula.Negation;
@@ -110,6 +113,12 @@ public class LogicCombinationTerm implements Formula {
 			return new Negation(((Operator) innerTerm).createDeepCopy());
 		else
 			return this;
+	}
+
+	@Override
+	public void getVariables(List<Variable> vars) {
+		innerTerm.getVariables(vars);
+		
 	}
 
 }

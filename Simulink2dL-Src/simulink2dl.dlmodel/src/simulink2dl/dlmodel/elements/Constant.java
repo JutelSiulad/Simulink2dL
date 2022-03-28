@@ -28,6 +28,9 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.elements;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import simulink2dl.dlmodel.term.Term;
 
 public class Constant implements Term {
@@ -128,4 +131,8 @@ public class Constant implements Term {
 		return value;
 	}
 
+	@Override
+	public void getVariables(List<Variable> vars) {
+		/* do nothing */
+	}
 }

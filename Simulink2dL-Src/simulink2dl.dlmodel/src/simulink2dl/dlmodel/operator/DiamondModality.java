@@ -28,6 +28,9 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.operator;
 
+import java.util.List;
+
+import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.HybridProgram;
 import simulink2dl.dlmodel.term.Term;
 
@@ -108,4 +111,9 @@ public class DiamondModality implements Operator {
 		return new DiamondModality(innerProgram.createDeepCopy(), postCondition.createDeepCopy());
 	}
 
+	@Override
+	public void getVariables(List<Variable> vars) {
+		/* todo hp.getVariables */
+		postCondition.getVariables(vars);		
+	}
 }

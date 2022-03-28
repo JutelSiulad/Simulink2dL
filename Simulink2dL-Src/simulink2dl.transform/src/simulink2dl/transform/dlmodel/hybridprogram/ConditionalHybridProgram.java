@@ -28,6 +28,9 @@
  ******************************************************************************/
 package simulink2dl.transform.dlmodel.hybridprogram;
 
+import java.util.List;
+
+import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.HybridProgram;
 import simulink2dl.dlmodel.hybridprogram.HybridProgramCollection;
 import simulink2dl.dlmodel.hybridprogram.TestFormula;
@@ -114,6 +117,11 @@ public class ConditionalHybridProgram implements HybridProgram {
 		/*condition.expand();*/
 		choice = choice.expand();
 		return this;
+	}
+
+	@Override
+	public void getBoundVariables(List<Variable> vars) {
+		choice.getBoundVariables(vars);
 	}
 
 }

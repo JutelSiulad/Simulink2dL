@@ -290,4 +290,10 @@ public class SignalboundaryInformation implements InvariantInformation {
 		return this.disjunction.containsTerm(term);
 	}
 
+	@Override
+	public void getVariables(List<Variable> vars) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

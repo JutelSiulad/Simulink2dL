@@ -214,4 +214,12 @@ public class ContinuousEvolution implements HybridProgram {
 		return this;
 	}
 
+	@Override
+	public void getBoundVariables(List<Variable> vars) {
+
+		for (SingleEvolution evolution : evolutionFormulas) {
+				evolution.getBoundVariables(vars);
+		}
+	}
+
 }

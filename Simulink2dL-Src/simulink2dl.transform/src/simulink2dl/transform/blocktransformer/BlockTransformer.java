@@ -38,6 +38,7 @@ import org.conqat.lib.simulink.model.SimulinkOutPort;
 
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
+import simulink2dl.dlmodel.hybridprogram.HybridProgram;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.operator.formula.Relation.RelationType;
 import simulink2dl.dlmodel.term.PortIdentifier;
@@ -61,6 +62,10 @@ public abstract class BlockTransformer {
 
 	protected Environment environment;
 
+	protected List<HybridProgram> outputAssignments;
+	
+	protected List<HybridProgram> inputAssignments;
+	
 	public abstract void transformBlock(SimulinkBlock block);
 
 	public abstract List<Macro> createMacro(SimulinkBlock block);

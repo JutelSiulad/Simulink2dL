@@ -366,4 +366,10 @@ public class IntervalInformation implements InvariantInformation {
 		return (IntervalInformation) this.clone();
 	}
 
+	@Override
+	public void getVariables(List<Variable> vars) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

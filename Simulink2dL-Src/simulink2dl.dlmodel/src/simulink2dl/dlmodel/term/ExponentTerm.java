@@ -28,6 +28,11 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.term;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import simulink2dl.dlmodel.elements.Variable;
+
 /**
  * A representation of exponentiation and roots.
  * 
@@ -175,6 +180,12 @@ public class ExponentTerm implements Term {
 	@Override
 	public ExponentTerm createDeepCopy() {
 		return new ExponentTerm(base.createDeepCopy(), exponent.createDeepCopy());
+	}
+
+	@Override
+	public void getVariables(List<Variable> vars) {
+		base.getVariables(vars);
+		exponent.getVariables(vars);
 	}
 
 }

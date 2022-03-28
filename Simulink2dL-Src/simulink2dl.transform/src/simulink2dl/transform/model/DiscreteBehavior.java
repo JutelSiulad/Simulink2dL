@@ -47,11 +47,13 @@ public class DiscreteBehavior {
 
 	private Variable stepClock;
 
-	private HybridProgramCollection onStepOutputAssignmnets;
+	private HybridProgramCollection onStepOutputBehavior;
 
-	private HybridProgramCollection onStepBehavior;
+	private HybridProgramCollection onStepInternalBehavior;
 
+	//output must be evaluated first, as values might be needed by following block
 	private ConditionalChoice stepOutputChoice;
+	//output must be evaluated first, as values might be needed by following block
 	private ConditionalChoice stepChoice;
 
 	public DiscreteBehavior(String stepSize) {
@@ -71,23 +73,17 @@ public class DiscreteBehavior {
 		Relation stepFalse = stepTrue.createNegation();
 
 		// output assignments
-		this.onStepOutputAssignmnets = new HybridProgramCollection();
-
-		HybridProgramCollection offStepOutputAssignmnets = new HybridProgramCollection();
-
+		this.onStepOutputBehavior = new HybridProgramCollection();
+		HybridProgramCollection emptyHP = new HybridProgramCollection();
 		this.stepOutputChoice = new ConditionalChoice();
-		this.stepOutputChoice.addChoice(stepTrue, onStepOutputAssignmnets);
-		this.stepOutputChoice.addChoice(stepFalse, offStepOutputAssignmnets);
+		this.stepOutputChoice.addChoice(stepTrue, onStepOutputBehavior);
+		this.stepOutputChoice.addChoice(stepFalse, emptyHP);
 
 		// case step
-		this.onStepBehavior = new HybridProgramCollection();
-
-		// case no step
-		HybridProgramCollection offStepBehavior = new HybridProgramCollection();
-
+		this.onStepInternalBehavior = new HybridProgramCollection();
 		this.stepChoice = new ConditionalChoice();
-		this.stepChoice.addChoice(stepTrue, onStepBehavior);
-		this.stepChoice.addChoice(stepFalse, offStepBehavior);
+		this.stepChoice.addChoice(stepTrue, onStepInternalBehavior);
+		this.stepChoice.addChoice(stepFalse, emptyHP);
 	}
 
 	public Constant getStepSizeConstant() {
@@ -111,37 +107,46 @@ public class DiscreteBehavior {
 	}
 
 	public void addBehavior(HybridProgram newBehavior) {
-		onStepBehavior.addElement(newBehavior);
+		onStepInternalBehavior.addElement(newBehavior);
 	}
 
 	public void addOutputUpdate(HybridProgram newBehavior) {
-		onStepOutputAssignmnets.addElementFront(newBehavior);
-	}
-
-	protected void addStepTimeReset() {
-		onStepBehavior.addElementFront(new DiscreteAssignment(stepClock, new RealTerm(0.0)));
+		onStepOutputBehavior.addElementFront(newBehavior);
 	}
 
 	public void addToModel(DLModelSimulink dlModel) {
+		addStepClock(dlModel);
 		addStepTimeReset();
-
+		addStepBehavior(dlModel);
+	}
+	
+	protected void addStepTimeReset() {
+		DiscreteAssignment reset = new DiscreteAssignment(stepClock, new RealTerm(0.0));
+		if(!onStepInternalBehavior.isEmpty()) {
+			onStepInternalBehavior.addElementFront(reset);
+		} else {
+			onStepOutputBehavior.addElementFront(reset);
+		}
+	}
+	
+	protected void addStepClock(DLModelSimulink dlModel) {
+		dlModel.addVariable(stepClock);
+		dlModel.addContinuousEvolution(stepClock, new RealTerm(1.0));
 		dlModel.addConstant(stepSizeConstant);
-		//Check whether the stepSize is a number
-		//Values for stepSizes represented by variables have to be filled in manually
+		
 		if(StringParser.isNumber(stepSize)) {
 			Relation initCondition = new Relation(stepSizeConstant, RelationType.EQUAL, new RealTerm(stepSize));
 			dlModel.addInitialCondition(initCondition);
 		}
-
-		//do not perform discrete action on start, instead set initial conditions and start with stepClock = 0
 		Relation initCondition = new Relation(stepClock, RelationType.EQUAL, new RealTerm(0.0));
-
-		dlModel.addVariable(stepClock);
 		dlModel.addInitialCondition(initCondition);
-		dlModel.addContinuousEvolution(stepClock, new RealTerm(1.0));
-
+	}
+	
+	protected void addStepBehavior(DLModelSimulink dlModel) {
 		dlModel.addBehaviorFront(stepOutputChoice);
-		dlModel.addBehavior(stepChoice);
+		if(!onStepInternalBehavior.isEmpty()) {
+			dlModel.addBehavior(stepChoice);
+		}
 	}
 
 }

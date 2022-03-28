@@ -28,6 +28,11 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.term;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import simulink2dl.dlmodel.elements.Variable;
+
 @Deprecated
 public class StringTerm implements Term {
 
@@ -85,6 +90,11 @@ public class StringTerm implements Term {
 	@Override
 	public StringTerm createDeepCopy() {
 		return new StringTerm(content);
+	}
+
+	@Override
+	public void getVariables(List<Variable> vars) {
+		/* do nothing */
 	}
 
 }

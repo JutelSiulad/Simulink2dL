@@ -28,6 +28,10 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.term;
 
+import java.util.List;
+
+import simulink2dl.dlmodel.elements.Variable;
+
 public interface Term {
 
 	void replaceTermRecursive(Term toReplace, Term replaceWith);
@@ -37,5 +41,10 @@ public interface Term {
 	boolean isAtomic();
 
 	public Term createDeepCopy();
-
+	
+	/**
+	 * Adds all variables contained in Term to vars (duplicates possible)
+	 * @param vars list of variables to add to
+	 */
+	public void getVariables(List<Variable> vars);
 }

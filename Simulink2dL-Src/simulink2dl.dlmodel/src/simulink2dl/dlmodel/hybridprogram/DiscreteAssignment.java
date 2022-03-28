@@ -28,6 +28,9 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.hybridprogram;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.dlmodel.term.VectorTerm;
@@ -131,5 +134,10 @@ public class DiscreteAssignment implements HybridProgram {
 				if(this.assignmentTerm!=null && this.assignmentTerm.equals(other.assignmentTerm))
 					return true;
 		return false;
+	}
+
+	@Override
+	public void getBoundVariables(List<Variable> vars) {
+		vars.add(variable);
 	}
 }

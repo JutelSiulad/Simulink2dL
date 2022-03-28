@@ -28,6 +28,8 @@
  ******************************************************************************/
 package simulink2dl.invariants.information;
 
+import java.util.List;
+
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.Operator;
 import simulink2dl.dlmodel.operator.formula.Implication;
@@ -172,5 +174,11 @@ public class DataInformation implements InvariantInformation {
 		if (conditions != null)
 			conditions.replaceTermRecursive(toReplace, replaceWith);
 		information.replaceTermRecursive(toReplace, replaceWith);
+	}
+
+	@Override
+	public void getVariables(List<Variable> vars) {
+		// TODO Auto-generated method stub
+		
 	}
 }

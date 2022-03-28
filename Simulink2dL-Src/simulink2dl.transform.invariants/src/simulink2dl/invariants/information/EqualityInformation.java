@@ -28,6 +28,8 @@
  ******************************************************************************/
 package simulink2dl.invariants.information;
 
+import java.util.List;
+
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.Operator;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
@@ -260,6 +262,12 @@ public class EqualityInformation implements InvariantInformation {
 	@Override
 	public boolean containsTerm(Term term) {
 		return equality.containsTerm(term);
+	}
+
+	@Override
+	public void getVariables(List<Variable> vars) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

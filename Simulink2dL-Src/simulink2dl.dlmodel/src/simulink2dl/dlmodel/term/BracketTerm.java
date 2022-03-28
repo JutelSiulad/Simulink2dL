@@ -28,6 +28,11 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.term;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import simulink2dl.dlmodel.elements.Variable;
+
 /**
  * @author nick
  *
@@ -113,4 +118,8 @@ public class BracketTerm implements Term {
 		return new BracketTerm(innerTerm.createDeepCopy());
 	}
 
+	@Override
+	public void getVariables(List<Variable> vars) {
+		innerTerm.getVariables(vars);
+	}
 }

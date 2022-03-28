@@ -28,6 +28,9 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.hybridprogram;
 
+import java.util.List;
+
+import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.term.Term;
 
 public interface HybridProgram {
@@ -48,5 +51,7 @@ public interface HybridProgram {
 	 * @return expanded hybrid program
 	 */
 	public HybridProgram expand();
+	
+	public void getBoundVariables(List<Variable> vars);
 
 }

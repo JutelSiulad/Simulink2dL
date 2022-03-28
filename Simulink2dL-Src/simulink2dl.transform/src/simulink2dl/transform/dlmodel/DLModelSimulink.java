@@ -35,6 +35,7 @@ import simulink2dl.dlmodel.DLModelDefaultStructure;
 import simulink2dl.dlmodel.contracts.HybridContract;
 import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
+import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
 import simulink2dl.dlmodel.hybridprogram.HybridProgram;
 import simulink2dl.dlmodel.hybridprogram.HybridProgramCollection;
 import simulink2dl.dlmodel.hybridprogram.SingleEvolution;
@@ -63,10 +64,16 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 	private List<HybridContract> rLContracts;
 	
 	private List<DiscreteBehavior> discreteBehaviors;
+	
+	private HybridProgramCollection discreteOutputBehavior;
 
 	private ContinuousEvolutionBehavior continuousBehavior;
 	
+	private HybridProgramCollection continousOutputBehavior;
+	
 	private ConcurrentContractBehavior concurrentContracts;
+	
+	private HybridProgramCollection unsortedOutpus;
 
 	@Deprecated
 	protected HybridProgramCollection contractBehavior;
@@ -82,8 +89,11 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 		
 		this.macros = new LinkedList<Macro>();
 
+		this.unsortedOutpus = new HybridProgramCollection();
 		this.discreteBehaviors = new LinkedList<DiscreteBehavior>();
+		this.discreteOutputBehavior = new HybridProgramCollection();
 		this.continuousBehavior = new ContinuousEvolutionBehavior();
+		this.continousOutputBehavior = new HybridProgramCollection();
 		this.contractBehavior = new HybridProgramCollection();
 
 		this.contracts = new LinkedList<HybridContract>();
@@ -99,9 +109,14 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 		this.continuousBehavior.addNewSingleEvolution(new SingleEvolution(simClock, new RealTerm(1.0)));
 	}
 
+	public void addOutput(HybridProgram output) {
+		unsortedOutpus.addElement(output);
+	}
+	
 	public void addMacro(Macro newMacro) {
 		this.macros.add(newMacro);
 	}
+	
 	/**
 	 * Replaces vector-variables with one variable for each entry
 	 */
@@ -133,11 +148,16 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 		// apply macros to the model
 		this.applyMacros();
 		
+		this.handleOutputs();
+		
+		// add outputs NOT influenced by continous behavior
+		this.addBehaviorFront(discreteOutputBehavior);
+		
 		// add continuous behavior
 		this.addBehavior(this.continuousBehavior.asHybridProgram());
-
-		// add contract behavior
-		this.addBehavior(this.contractBehavior);
+		
+		// add outputs influenced by continous behavior
+		this.addBehavior(continousOutputBehavior);
 
 		// expand HPs with Vectorterms
 		this.expandVectors();
@@ -154,6 +174,41 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 			addConjunctionToAllEvolutionDomains(stepCondition);
 		}
 	}
+	
+	private void handleOutputs() {
+		List<HybridProgram> outputAssignments = unsortedOutpus.getInnerPrograms();
+		
+		LinkedList<Variable> discBoundVars = new LinkedList<Variable>();
+		behavior.getBoundVariables(discBoundVars);
+		LinkedList<Variable> contBoundVars = new LinkedList<Variable>();
+		continuousBehavior.getBoundVariables(contBoundVars);
+		
+		for(HybridProgram e : outputAssignments) {
+			DiscreteAssignment outputAssignment = (DiscreteAssignment)e;
+			LinkedList<Variable> freeVariables = new LinkedList<Variable>();
+			outputAssignment.getAssignmentTerm().getVariables(freeVariables);
+			
+			//check whether output is dependent on continuous variable
+			boolean isContinuous = false;
+			boolean isDiscrete = false;
+			for(Variable fvar : freeVariables) {
+				if(contBoundVars.contains(fvar)) {
+					isContinuous=true;
+					break; //break on first variable changed by continuous evolution
+				} else if (discBoundVars.contains(fvar)) {
+					isDiscrete=true; 
+					// keep searching for continuous variable
+				}
+			}
+			
+			if(isContinuous|!(isDiscrete)) {
+				continousOutputBehavior.addElement(e);
+			} else {
+				discreteOutputBehavior.addElement(e);
+			}
+		}
+	}
+
 	/**
 	 * Apply Macros to the dL model
 	 */
@@ -169,7 +224,8 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 			macro.applyToContinuousBehavior(continuousBehavior);
 
 			// handle contract behavior
-			macro.applyToHybridProgramCollection(contractBehavior);
+			macro.applyToHybridProgramCollection(unsortedOutpus);
+			
 		}
 	}
 	

@@ -31,6 +31,7 @@ package simulink2dl.transform.dlmodel.hybridprogram;
 import java.util.LinkedList;
 import java.util.List;
 
+import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.HybridProgram;
 import simulink2dl.dlmodel.operator.formula.Formula;
 import simulink2dl.dlmodel.term.Term;
@@ -164,6 +165,13 @@ public class ConditionalChoice implements HybridProgram {
 			choices.set(i, (ConditionalHybridProgram) choices.get(i).expand());
 		}
 		return this;
+	}
+
+	@Override
+	public void getBoundVariables(List<Variable> vars) {
+		for (HybridProgram choice : choices) {
+			choice.getBoundVariables(vars);
+		}
 	}
 
 }

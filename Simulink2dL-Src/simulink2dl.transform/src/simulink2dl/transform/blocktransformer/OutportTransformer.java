@@ -67,7 +67,7 @@ public class OutportTransformer extends BlockTransformer {
 
 		dlModel.addMacro(new SizePropagationMacro(new PortIdentifier(portID),variable));
 		// add assignment
-		dlModel.addBehavior(new DiscreteAssignment(variable, new PortIdentifier(portID)));
+		dlModel.addOutput(new DiscreteAssignment(variable, new PortIdentifier(portID)));
 		
 		// add initial condition
 		dlModel.addInitialCondition(new Relation(variable, RelationType.EQUAL,  new PortIdentifier(portID)));

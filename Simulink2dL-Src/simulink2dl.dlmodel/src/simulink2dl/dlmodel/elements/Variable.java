@@ -28,6 +28,9 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.elements;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.ResizableTerm;
 import simulink2dl.dlmodel.term.Term;
@@ -136,6 +139,11 @@ public class Variable extends ResizableTerm implements ReplaceableTerm{
 	@Override
 	public String getIdentifier() {
 		return type+"_"+name;
+	}
+
+	@Override
+	public void getVariables(List<Variable> vars) {
+		vars.add(this);
 	}
 
 }

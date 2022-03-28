@@ -32,6 +32,8 @@ package simulink2dl.dlmodel.term;
 import java.util.LinkedList;
 import java.util.List;
 
+import simulink2dl.dlmodel.elements.Variable;
+
 @SuppressWarnings("serial")
 /**
  * VectorTerm for vector macro applications
@@ -143,5 +145,12 @@ public class VectorTerm extends LinkedList<Term> implements Term {
 			copy.add(term.createDeepCopy());
 		}
 		return copy;
+	}
+
+	@Override
+	public void getVariables(List<Variable> vars) {
+		for(Term term : this) {
+			term.getVariables(vars);
+		}
 	}
 }

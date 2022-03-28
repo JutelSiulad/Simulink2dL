@@ -31,6 +31,8 @@ package simulink2dl.dlmodel.term;
 import java.util.LinkedList;
 import java.util.List;
 
+import simulink2dl.dlmodel.elements.Variable;
+
 /**
  * @author nick
  *
@@ -208,6 +210,13 @@ public class AdditionTerm implements Term {
 		}
 
 		return result;
+	}
+
+	@Override
+	public void getVariables(List<Variable> vars) {
+		for (Term summand : summands) {
+			summand.getVariables(vars);
+		}
 	}
 
 }

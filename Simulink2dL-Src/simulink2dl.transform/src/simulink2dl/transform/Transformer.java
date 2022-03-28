@@ -179,8 +179,7 @@ public class Transformer {
 
 		// transform model
 		for (SimulinkBlock block : blockList) {
-			BlockTransformer blockTransformer = transformerFactory.getBlockTransformer(block, simulinkModel, dlModel,
-					environment);
+			BlockTransformer blockTransformer = transformerFactory.getBlockTransformer(block, simulinkModel, dlModel, environment);
 			if (selectedHandler.contains("Controlflow")) {
 				blockTransformer.setHandleControlFlow(true);
 			}

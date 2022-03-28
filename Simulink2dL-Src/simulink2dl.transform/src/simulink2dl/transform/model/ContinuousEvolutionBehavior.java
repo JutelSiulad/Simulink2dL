@@ -31,6 +31,7 @@ package simulink2dl.transform.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.ContinuousEvolution;
 import simulink2dl.dlmodel.hybridprogram.HybridProgram;
 import simulink2dl.dlmodel.hybridprogram.SingleEvolution;
@@ -242,6 +243,13 @@ public class ContinuousEvolutionBehavior {
 			evolution.expand();
 		}
 		return this;
+	}
+
+	
+	public void getBoundVariables(List<Variable> vars) {
+		for(ContinuousEvolutionContainer cec : evolutions) {
+			cec.getBoundVariables(vars);
+		}
 	}
 
 }

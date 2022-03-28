@@ -31,6 +31,7 @@ package simulink2dl.dlmodel.hybridprogram;
 import java.util.LinkedList;
 import java.util.List;
 
+import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.term.Term;
 
 /**
@@ -147,6 +148,13 @@ public class NondeterministicChoice implements HybridProgram {
 			choices.set(i, choice);
 		}
 		return this;
+	}
+
+	@Override
+	public void getBoundVariables(List<Variable> vars) {
+		for (HybridProgram element : choices) {
+			element.getBoundVariables(vars);
+		}
 	}
 
 }

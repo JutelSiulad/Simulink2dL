@@ -28,6 +28,11 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.term;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import simulink2dl.dlmodel.elements.Variable;
+
 public class RealTerm implements Term {
 
 	@Override
@@ -89,4 +94,7 @@ public class RealTerm implements Term {
 		return new RealTerm(value);
 	}
 
+	public void getVariables(List<Variable> vars) {
+		/* do nothing */
+	}
 }

@@ -31,6 +31,8 @@ package simulink2dl.dlmodel.term;
 import java.util.LinkedList;
 import java.util.List;
 
+import simulink2dl.dlmodel.elements.Variable;
+
 public class MinMaxTerm implements Term {
 	
 	public MinMaxTerm(Term first, Term second, String minOrMax) {
@@ -110,6 +112,13 @@ public class MinMaxTerm implements Term {
 	@Override
 	public MinMaxTerm createDeepCopy() {
 		return new MinMaxTerm(first.createDeepCopy(), second.createDeepCopy(), minOrMax);
+	}
+
+
+	@Override
+	public void getVariables(List<Variable> vars) {
+		first.getVariables(vars);
+		second.getVariables(vars);
 	}
 
 }

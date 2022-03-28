@@ -28,6 +28,8 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.operator;
 
+import java.util.List;
+
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.term.Term;
 
@@ -93,6 +95,12 @@ public class UniversalQuantifier implements Operator {
 	@Override
 	public UniversalQuantifier createDeepCopy() {
 		return new UniversalQuantifier(variable.createDeepCopy(), innerOperator.createDeepCopy());
+	}
+
+	@Override
+	public void getVariables(List<Variable> vars) {
+		variable.getVariables(vars);
+		innerOperator.getVariables(vars);
 	}
 
 }

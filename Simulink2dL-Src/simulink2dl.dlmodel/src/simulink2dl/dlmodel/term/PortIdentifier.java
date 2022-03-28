@@ -28,6 +28,11 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.term;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import simulink2dl.dlmodel.elements.Variable;
+
 public class PortIdentifier implements ReplaceableTerm {
 
 	private String identifier;
@@ -92,6 +97,11 @@ public class PortIdentifier implements ReplaceableTerm {
 	@Override
 	public PortIdentifier createDeepCopy() {
 		return new PortIdentifier(identifier);
+	}
+
+	@Override
+	public void getVariables(List<Variable> vars) {
+		/* do nothing */
 	}
 
 }
