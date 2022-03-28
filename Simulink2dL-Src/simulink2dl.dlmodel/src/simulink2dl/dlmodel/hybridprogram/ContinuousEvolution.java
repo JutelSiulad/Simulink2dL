@@ -172,24 +172,6 @@ public class ContinuousEvolution implements HybridProgram {
 	}
 
 	@Override
-	public void replaceTermRecursive(Term toReplace, Term replaceWith) {
-		for (SingleEvolution evolution : evolutionFormulas) {
-			evolution.replace(toReplace, replaceWith);
-		}
-		evolutionDomain.replaceTermRecursive(toReplace, replaceWith);
-	}
-
-	@Override
-	public boolean containsTerm(Term term) {
-		for (SingleEvolution singleEvolution : evolutionFormulas) {
-			if (singleEvolution.containsTerm(term)) {
-				return true;
-			}
-		}
-		return evolutionDomain.containsTerm(term);
-	}
-
-	@Override
 	public ContinuousEvolution createDeepCopy() {
 		ContinuousEvolution result = new ContinuousEvolution(evolutionDomain.createDeepCopy());
 
@@ -222,11 +204,15 @@ public class ContinuousEvolution implements HybridProgram {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
-		for (SingleEvolution evolution : evolutionFormulas) {
-			evolution.getVariable().getVariables(vars);
-		}
-		evolutionDomain.getVariables(vars);
+	public List<HybridProgram> getInnerPrograms() {
+		return new LinkedList<HybridProgram>();
+	}
+
+	@Override
+	public List<Term> getInnerTerms() {
+		LinkedList<Term> terms = new LinkedList<Term>();
+		terms.add(evolutionDomain);
+		return terms;
 	}
 
 }

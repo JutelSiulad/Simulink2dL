@@ -119,22 +119,6 @@ public class HybridProgramCollection implements HybridProgram {
 		return sequenceString;
 	}
 
-	@Override
-	public void replaceTermRecursive(Term toReplace, Term replaceWith) {
-		for (HybridProgram element : sequence) {
-			element.replaceTermRecursive(toReplace, replaceWith);
-		}
-	}
-
-	@Override
-	public boolean containsTerm(Term term) {
-		for (HybridProgram element : sequence) {
-			if (element.containsTerm(term)) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	@Override
 	public HybridProgramCollection createDeepCopy() {
@@ -158,17 +142,8 @@ public class HybridProgramCollection implements HybridProgram {
 	}
 
 	@Override
-	public void getBoundVariables(List<Variable> vars) {
-		for (HybridProgram p : sequence) {
-			p.getBoundVariables(vars);
-		}
-	}
-
-	@Override
-	public void getVariables(List<Variable> vars) {
-		for (HybridProgram p : sequence) {
-			p.getVariables(vars);
-		}
+	public List<Term> getInnerTerms() {
+		return new LinkedList<Term>();
 	}
 
 }

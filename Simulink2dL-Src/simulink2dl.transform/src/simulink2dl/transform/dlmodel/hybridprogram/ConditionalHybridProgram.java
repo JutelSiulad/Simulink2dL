@@ -28,6 +28,7 @@
  ******************************************************************************/
 package simulink2dl.transform.dlmodel.hybridprogram;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import simulink2dl.dlmodel.elements.Variable;
@@ -77,20 +78,6 @@ public class ConditionalHybridProgram implements HybridProgram {
 	}
 
 	@Override
-	public void replaceTermRecursive(Term toReplace, Term replaceWith) {
-		if (condition.equals(toReplace)) {
-			condition = (Formula) replaceWith;
-		} else {
-			condition.replaceTermRecursive(toReplace, replaceWith);
-		}
-		if (choice.equals(toReplace)) {
-			choice = (HybridProgram) replaceWith;
-		} else {
-			choice.replaceTermRecursive(toReplace, replaceWith);
-		}
-	}
-
-	@Override
 	public boolean containsTerm(Term term) {
 		if (condition.equals(term)) {
 			return true;
@@ -128,6 +115,20 @@ public class ConditionalHybridProgram implements HybridProgram {
 	public void getVariables(List<Variable> vars) {
 		choice.getBoundVariables(vars);
 		
+	}
+
+	@Override
+	public List<HybridProgram> getInnerPrograms() {
+		LinkedList<HybridProgram> hps = new LinkedList<HybridProgram>();
+		hps.add(choice);
+		return hps;
+	}
+
+	@Override
+	public List<Term> getInnerTerms() {
+		LinkedList<Term> terms = new LinkedList<Term>();
+		terms.add(condition);
+		return terms;
 	}
 
 }

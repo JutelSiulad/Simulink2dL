@@ -84,19 +84,6 @@ public class IfStatement implements HybridProgram {
 	}
 
 	@Override
-	public void replaceTermRecursive(Term toReplace, Term replaceWith) {
-		if (condition.equals(toReplace)) {
-			condition = (Formula) replaceWith;
-		} else {
-			condition.replaceTermRecursive(toReplace, replaceWith);
-		}
-		ifProgram.replaceTermRecursive(toReplace, replaceWith);
-		if (elseProgram != null) {
-			elseProgram.replaceTermRecursive(toReplace, replaceWith);
-		}
-	}
-
-	@Override
 	public boolean containsTerm(Term term) {
 		if (condition.containsTerm(term)) {
 			return true;
@@ -142,16 +129,20 @@ public class IfStatement implements HybridProgram {
 		return this;
 	}
 
+
 	@Override
-	public void getBoundVariables(List<Variable> vars) {
-		ifProgram.getBoundVariables(vars);
-		elseProgram.getBoundVariables(vars);
+	public List<HybridProgram> getInnerPrograms() {
+		LinkedList<HybridProgram> hps = new LinkedList<HybridProgram>();
+		hps.add(ifProgram);
+		hps.add(elseProgram);
+		return hps;
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
-		ifProgram.getVariables(vars);
-		elseProgram.getVariables(vars);
+	public List<Term> getInnerTerms() {
+		LinkedList<Term> terms = new LinkedList<Term>();
+		terms.add(condition);
+		return terms;
 	}
 
 }

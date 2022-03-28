@@ -94,20 +94,6 @@ public class NondeterministicRepetition implements HybridProgram {
 	}
 
 	@Override
-	public void replaceTermRecursive(Term toReplace, Term replaceWith) {
-		innerProgram.replaceTermRecursive(toReplace, replaceWith);
-		invariant.replaceTermRecursive(toReplace, replaceWith);
-	}
-
-	@Override
-	public boolean containsTerm(Term term) {
-		if (innerProgram.containsTerm(term)) {
-			return true;
-		}
-		return invariant.containsTerm(term);
-	}
-
-	@Override
 	public NondeterministicRepetition createDeepCopy() {
 		return new NondeterministicRepetition(innerProgram.createDeepCopy(), invariant.createDeepCopy());
 	}
@@ -133,14 +119,17 @@ public class NondeterministicRepetition implements HybridProgram {
 	}
 
 	@Override
-	public void getBoundVariables(List<Variable> vars) {
-		innerProgram.getBoundVariables(vars);
+	public List<HybridProgram> getInnerPrograms() {
+		LinkedList<HybridProgram> hps = new LinkedList<HybridProgram>();
+		hps.add(innerProgram);
+		return hps;
 	}
-	
+
 	@Override
-	public void getVariables(List<Variable> vars) {
-		innerProgram.getVariables(vars);
-		invariant.getVariables(vars);
+	public List<Term> getInnerTerms() {
+		LinkedList<Term> terms = new LinkedList<Term>();
+		terms.add(invariant);
+		return terms;
 	}
 
 }

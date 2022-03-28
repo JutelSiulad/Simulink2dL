@@ -113,23 +113,6 @@ public class NondeterministicChoice implements HybridProgram {
 	}
 
 	@Override
-	public void replaceTermRecursive(Term toReplace, Term replaceWith) {
-		for (HybridProgram choice : choices) {
-			choice.replaceTermRecursive(toReplace, replaceWith);
-		}
-	}
-
-	@Override
-	public boolean containsTerm(Term term) {
-		for (HybridProgram choice : choices) {
-			if (choice.containsTerm(term)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
 	public NondeterministicChoice createDeepCopy() {
 		NondeterministicChoice result = new NondeterministicChoice();
 
@@ -151,17 +134,13 @@ public class NondeterministicChoice implements HybridProgram {
 	}
 
 	@Override
-	public void getBoundVariables(List<Variable> vars) {
-		for (HybridProgram element : choices) {
-			element.getBoundVariables(vars);
-		}
+	public List<HybridProgram> getInnerPrograms() {
+		return choices;
 	}
-	
+
 	@Override
-	public void getVariables(List<Variable> vars) {
-		for (HybridProgram element : choices) {
-			element.getVariables(vars);
-		}
+	public List<Term> getInnerTerms() {
+		return new LinkedList<Term>();
 	}
 
 }

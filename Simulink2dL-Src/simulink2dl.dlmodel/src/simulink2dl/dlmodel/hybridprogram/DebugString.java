@@ -62,16 +62,6 @@ public class DebugString implements HybridProgram {
 	}
 
 	@Override
-	public void replaceTermRecursive(Term toReplace, Term replaceWith) {
-		// do nothing
-	}
-
-	@Override
-	public boolean containsTerm(Term term) {
-		return false;
-	}
-
-	@Override
 	public DebugString createDeepCopy() {
 		return new DebugString(content);
 	}
@@ -90,6 +80,16 @@ public class DebugString implements HybridProgram {
 	@Override
 	public void getVariables(List<Variable> vars) {
 		// do nothing
+	}
+
+	@Override
+	public List<HybridProgram> getInnerPrograms() {
+		return new LinkedList<HybridProgram>();
+	}
+
+	@Override
+	public List<Term> getInnerTerms() {
+		return new LinkedList<Term>();
 	}
 	
 

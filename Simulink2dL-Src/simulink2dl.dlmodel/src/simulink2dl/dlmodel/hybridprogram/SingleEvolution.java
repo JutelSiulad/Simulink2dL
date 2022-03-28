@@ -29,7 +29,6 @@
 package simulink2dl.dlmodel.hybridprogram;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.term.Term;
@@ -43,7 +42,7 @@ import simulink2dl.util.PluginLogger;
  * @author Timm Liebrenz
  *
  */
-public class SingleEvolution {
+public class SingleEvolution  {
 
 	private Variable variable;
 
@@ -63,18 +62,14 @@ public class SingleEvolution {
 	public Variable getVariable() {
 		return variable;
 	}
+	
+	public Term getEvolution() {
+		return evolution;
+	}
 
 	@Override
 	public String toString() {
 		return variable.toString() + "' = " + evolution.toString();
-	}
-
-	public void replace(Term toReplace, Term replaceWith) {
-		if (evolution.equals(toReplace)) {
-			evolution = replaceWith;
-		} else {
-			evolution.replaceTermRecursive(toReplace, replaceWith);
-		}
 	}
 
 	public boolean containsTerm(Term term) {

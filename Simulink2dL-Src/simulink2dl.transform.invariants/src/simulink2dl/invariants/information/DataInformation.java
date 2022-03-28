@@ -181,4 +181,10 @@ public class DataInformation implements InvariantInformation {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public List<Term> getInternalTerms() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -28,6 +28,7 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.hybridprogram;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -77,23 +78,6 @@ public class DiscreteAssignment implements HybridProgram {
 	}
 
 	@Override
-	public void replaceTermRecursive(Term toReplace, Term replaceWith) {
-		if (assignmentTerm.equals(toReplace)) {
-			assignmentTerm = replaceWith;
-		} else {
-			assignmentTerm.replaceTermRecursive(toReplace, replaceWith);
-		}
-	}
-
-	@Override
-	public boolean containsTerm(Term term) {
-		if (assignmentTerm.equals(term)) {
-			return true;
-		}
-		return assignmentTerm.containsTerm(term);
-	}
-
-	@Override
 	public DiscreteAssignment createDeepCopy() {
 		return new DiscreteAssignment(variable.createDeepCopy(), assignmentTerm.createDeepCopy());
 	}
@@ -140,10 +124,16 @@ public class DiscreteAssignment implements HybridProgram {
 	public void getBoundVariables(List<Variable> vars) {
 		variable.getVariables(vars);
 	}
-	
+
 	@Override
-	public void getVariables(List<Variable> vars) {
-		variable.getVariables(vars);
-		assignmentTerm.getVariables(vars);
+	public List<HybridProgram> getInnerPrograms() {
+		return new LinkedList<HybridProgram>();
+	}
+
+	@Override
+	public List<Term> getInnerTerms() {
+		LinkedList<Term> terms = new LinkedList<Term>();
+		terms.add(variable); terms.add(assignmentTerm);
+		return terms;
 	}
 }

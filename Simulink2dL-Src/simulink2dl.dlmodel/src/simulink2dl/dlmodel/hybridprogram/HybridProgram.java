@@ -28,6 +28,7 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.hybridprogram;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import simulink2dl.dlmodel.elements.Variable;
@@ -39,9 +40,54 @@ public interface HybridProgram {
 
 	public String toStringFormatted(String indent, boolean multiLineTestFormulas, boolean multiLineEvolutionDomains);
 
-	public void replaceTermRecursive(Term toReplace, Term replaceWith);
+	public default void replaceTermRecursive(Term toReplace, Term replaceWith) {
+		List<HybridProgram> innerHPs = this.getInnerPrograms();
+		for(HybridProgram innerHP : innerHPs) {
+			innerHP.replaceTermRecursive(toReplace, replaceWith);
+		}
+		List<Term> innerTerms = this.getInnerTerms();
+		for(Term innerTerm : innerTerms) {
+			innerTerm.replaceTermRecursive(toReplace, replaceWith);
+		}
+	}
 
-	public boolean containsTerm(Term term);
+	public default boolean containsTerm(Term term) {
+		List<HybridProgram> innerHPs = this.getInnerPrograms();
+		for(HybridProgram innerHP : innerHPs) {
+			if(innerHP.containsTerm(term)) {
+				return true;
+			}
+		}
+		List<Term> innerTerms = this.getInnerTerms();
+		for(Term innerTerm : innerTerms) {
+			if(innerTerm.containsTerm(term)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public default void getBoundVariables(List<Variable> vars) {
+		List<HybridProgram> innerHPs = this.getInnerPrograms();
+		for(HybridProgram innerHP : innerHPs) {
+			innerHP.getBoundVariables(vars);
+		}
+	}
+	
+	public default void getVariables(List<Variable> vars) {
+		List<HybridProgram> innerHPs = this.getInnerPrograms();
+		for(HybridProgram innerHP : innerHPs) {
+			innerHP.getVariables(vars);
+		}
+		List<Term> innerTerms = this.getInnerTerms();
+		for(Term innerTerm : innerTerms) {
+			innerTerm.getVariables(vars);
+		}
+	}
+	
+	public List<HybridProgram> getInnerPrograms();
+	
+	public List<Term> getInnerTerms();
 
 	public HybridProgram createDeepCopy();
 	
@@ -51,9 +97,4 @@ public interface HybridProgram {
 	 * @return expanded hybrid program
 	 */
 	public HybridProgram expand();
-	
-	public void getBoundVariables(List<Variable> vars);
-	
-	public void getVariables(List<Variable> vars);
-
 }

@@ -372,4 +372,10 @@ public class IntervalInformation implements InvariantInformation {
 		
 	}
 
+	@Override
+	public List<Term> getInternalTerms() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

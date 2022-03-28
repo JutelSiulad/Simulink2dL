@@ -74,23 +74,6 @@ public class TestFormula implements HybridProgram {
 	}
 
 	@Override
-	public void replaceTermRecursive(Term toReplace, Term replaceWith) {
-		if (formula.equals(toReplace)) {
-			formula = (Formula) replaceWith;
-		} else {
-			formula.replaceTermRecursive(toReplace, replaceWith);
-		}
-	}
-
-	@Override
-	public boolean containsTerm(Term term) {
-		if (formula.equals(term)) {
-			return true;
-		}
-		return formula.containsTerm(term);
-	}
-
-	@Override
 	public TestFormula createDeepCopy() {
 		return new TestFormula(formula.createDeepCopy());
 	}
@@ -102,13 +85,15 @@ public class TestFormula implements HybridProgram {
 	}
 
 	@Override
-	public void getBoundVariables(List<Variable> vars) {
-		/* do nothing */
+	public List<HybridProgram> getInnerPrograms() {
+		return new LinkedList<HybridProgram>();
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
-		formula.getVariables(vars);
+	public List<Term> getInnerTerms() {
+		LinkedList<Term> terms = new LinkedList<Term>();
+		terms.add(formula);
+		return terms;
 	}
 
 }

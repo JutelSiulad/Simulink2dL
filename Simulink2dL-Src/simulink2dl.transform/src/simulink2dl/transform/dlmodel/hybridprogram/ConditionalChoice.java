@@ -127,13 +127,6 @@ public class ConditionalChoice implements HybridProgram {
 	}
 
 	@Override
-	public void replaceTermRecursive(Term toReplace, Term replaceWith) {
-		for (ConditionalHybridProgram choice : choices) {
-			choice.replaceTermRecursive(toReplace, replaceWith);
-		}
-	}
-
-	@Override
 	public boolean containsTerm(Term term) {
 		for (ConditionalHybridProgram choice : choices) {
 			if (choice.containsTerm(term)) {
@@ -179,6 +172,17 @@ public class ConditionalChoice implements HybridProgram {
 		for (HybridProgram choice : choices) {
 			choice.getVariables(vars);
 		}
+	}
+
+	@Override
+	public List<HybridProgram> getInnerPrograms() {
+		return new LinkedList<HybridProgram>(choices);
+	}
+
+	@Override
+	public List<Term> getInnerTerms() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

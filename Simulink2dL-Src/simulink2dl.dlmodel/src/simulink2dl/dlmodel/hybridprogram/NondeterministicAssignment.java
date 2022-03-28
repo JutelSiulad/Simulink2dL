@@ -67,11 +67,6 @@ public class NondeterministicAssignment implements HybridProgram {
 	}
 
 	@Override
-	public void replaceTermRecursive(Term toReplace, Term replaceWith) {
-		// do nothing
-	}
-
-	@Override
 	public boolean containsTerm(Term term) {
 		return false;
 	}
@@ -100,8 +95,15 @@ public class NondeterministicAssignment implements HybridProgram {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
-		vars.add(variable);
+	public List<HybridProgram> getInnerPrograms() {
+		return new LinkedList<HybridProgram>();
+	}
+
+	@Override
+	public List<Term> getInnerTerms() {
+		LinkedList<Term> terms = new LinkedList<Term>();
+		terms.add(variable);
+		return terms;
 	}
 
 }
