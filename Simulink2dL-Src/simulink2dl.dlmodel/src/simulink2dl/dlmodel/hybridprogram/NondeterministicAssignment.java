@@ -99,5 +99,9 @@ public class NondeterministicAssignment implements HybridProgram {
 		vars.add(variable);
 	}
 
+	@Override
+	public void getVariables(List<Variable> vars) {
+		vars.add(variable);
+	}
 
 }

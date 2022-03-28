@@ -53,5 +53,7 @@ public interface HybridProgram {
 	public HybridProgram expand();
 	
 	public void getBoundVariables(List<Variable> vars);
+	
+	public void getVariables(List<Variable> vars);
 
 }

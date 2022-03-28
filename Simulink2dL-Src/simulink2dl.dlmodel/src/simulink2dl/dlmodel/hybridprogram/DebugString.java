@@ -86,6 +86,11 @@ public class DebugString implements HybridProgram {
 	public void getBoundVariables(List<Variable> vars) {
 		// do nothing
 	}
+
+	@Override
+	public void getVariables(List<Variable> vars) {
+		// do nothing
+	}
 	
 
 

@@ -136,5 +136,11 @@ public class NondeterministicRepetition implements HybridProgram {
 	public void getBoundVariables(List<Variable> vars) {
 		innerProgram.getBoundVariables(vars);
 	}
+	
+	@Override
+	public void getVariables(List<Variable> vars) {
+		innerProgram.getVariables(vars);
+		invariant.getVariables(vars);
+	}
 
 }

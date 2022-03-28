@@ -164,4 +164,11 @@ public class HybridProgramCollection implements HybridProgram {
 		}
 	}
 
+	@Override
+	public void getVariables(List<Variable> vars) {
+		for (HybridProgram p : sequence) {
+			p.getVariables(vars);
+		}
+	}
+
 }

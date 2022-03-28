@@ -106,4 +106,9 @@ public class TestFormula implements HybridProgram {
 		/* do nothing */
 	}
 
+	@Override
+	public void getVariables(List<Variable> vars) {
+		formula.getVariables(vars);
+	}
+
 }

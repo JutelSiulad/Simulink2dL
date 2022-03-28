@@ -138,6 +138,12 @@ public class DiscreteAssignment implements HybridProgram {
 
 	@Override
 	public void getBoundVariables(List<Variable> vars) {
-		vars.add(variable);
+		variable.getVariables(vars);
+	}
+	
+	@Override
+	public void getVariables(List<Variable> vars) {
+		variable.getVariables(vars);
+		assignmentTerm.getVariables(vars);
 	}
 }

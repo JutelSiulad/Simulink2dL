@@ -156,5 +156,12 @@ public class NondeterministicChoice implements HybridProgram {
 			element.getBoundVariables(vars);
 		}
 	}
+	
+	@Override
+	public void getVariables(List<Variable> vars) {
+		for (HybridProgram element : choices) {
+			element.getVariables(vars);
+		}
+	}
 
 }

@@ -115,8 +115,4 @@ public class SingleEvolution {
 		}
 		return evolutions;
 	}
-
-	public void getBoundVariables(List<Variable> vars) {
-		vars.add(variable);
-	}
 }

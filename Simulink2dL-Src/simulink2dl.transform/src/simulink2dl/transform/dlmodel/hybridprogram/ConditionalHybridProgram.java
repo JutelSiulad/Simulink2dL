@@ -124,4 +124,10 @@ public class ConditionalHybridProgram implements HybridProgram {
 		choice.getBoundVariables(vars);
 	}
 
+	@Override
+	public void getVariables(List<Variable> vars) {
+		choice.getBoundVariables(vars);
+		
+	}
+
 }

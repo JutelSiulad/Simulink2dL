@@ -148,5 +148,10 @@ public class IfStatement implements HybridProgram {
 		elseProgram.getBoundVariables(vars);
 	}
 
+	@Override
+	public void getVariables(List<Variable> vars) {
+		ifProgram.getVariables(vars);
+		elseProgram.getVariables(vars);
+	}
 
 }

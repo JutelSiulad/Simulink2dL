@@ -174,4 +174,11 @@ public class ConditionalChoice implements HybridProgram {
 		}
 	}
 
+	@Override
+	public void getVariables(List<Variable> vars) {
+		for (HybridProgram choice : choices) {
+			choice.getVariables(vars);
+		}
+	}
+
 }
