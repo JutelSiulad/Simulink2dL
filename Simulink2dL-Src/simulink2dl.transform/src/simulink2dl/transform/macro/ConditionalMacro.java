@@ -225,7 +225,7 @@ public class ConditionalMacro extends Macro {
 	@Override
 	public void applyToHybridProgramCollection(HybridProgramCollection hybridProgram) {
 		// handle discrete behavior
-		List<HybridProgram> programList = hybridProgram.getInnerPrograms();
+		List<HybridProgram> programList = hybridProgram.getInnerPrograms(new LinkedList<HybridProgram>());
 
 		for (int i = 0; i < programList.size(); i++) {
 			HybridProgram innerProgram = programList.get(i);

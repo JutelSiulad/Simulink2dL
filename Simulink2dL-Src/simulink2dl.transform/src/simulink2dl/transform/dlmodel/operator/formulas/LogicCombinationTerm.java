@@ -116,9 +116,9 @@ public class LogicCombinationTerm implements Formula {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		innerTerm.getVariables(vars);
-		
+		return vars;
 	}
 
 }

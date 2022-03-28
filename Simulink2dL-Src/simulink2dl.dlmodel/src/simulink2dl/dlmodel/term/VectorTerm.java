@@ -148,9 +148,10 @@ public class VectorTerm extends LinkedList<Term> implements Term {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		for(Term term : this) {
 			term.getVariables(vars);
 		}
+		return vars;
 	}
 }

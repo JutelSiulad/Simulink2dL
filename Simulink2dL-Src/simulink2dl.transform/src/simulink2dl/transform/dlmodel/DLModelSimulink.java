@@ -39,7 +39,7 @@ import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
 import simulink2dl.dlmodel.hybridprogram.HybridProgram;
 import simulink2dl.dlmodel.hybridprogram.HybridProgramCollection;
 import simulink2dl.dlmodel.hybridprogram.NondeterministicAssignment;
-import simulink2dl.dlmodel.hybridprogram.SingleEvolution;
+import simulink2dl.dlmodel.hybridprogram.DifferentialEquation;
 import simulink2dl.dlmodel.hybridprogram.TestFormula;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Formula;
@@ -114,7 +114,7 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 		initCondition = new Relation(simClock, RelationType.EQUAL, new RealTerm(0.0));
 		addVariable(simClock);
 		addInitialCondition(initCondition);
-		this.continuousBehavior.addNewSingleEvolution(new SingleEvolution(simClock, new RealTerm(1.0)));
+		this.continuousBehavior.addNewSingleEvolution(new DifferentialEquation(simClock, new RealTerm(1.0)));
 	}
 
 	public void addOutput(HybridProgram output) {
@@ -196,7 +196,7 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 	}
 	
 	private void handleOutputs() {
-		List<HybridProgram> outputAssignments = unsortedOutpus.getInnerPrograms();
+		List<HybridProgram> outputAssignments = unsortedOutpus.getInnerPrograms(new LinkedList<HybridProgram>());
 		
 		LinkedList<Variable> discBoundVars = new LinkedList<Variable>();
 		behavior.getBoundVariables(discBoundVars);
@@ -404,7 +404,7 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 	 * @param evolutionTerm
 	 */
 	public void addContinuousEvolution(Variable variable, Term evolutionTerm) {
-		continuousBehavior.addNewSingleEvolution(new SingleEvolution(variable, evolutionTerm));
+		continuousBehavior.addNewSingleEvolution(new DifferentialEquation(variable, evolutionTerm));
 	}
 	
 	/**

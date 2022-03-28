@@ -116,9 +116,10 @@ public class MinMaxTerm implements Term {
 
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		first.getVariables(vars);
 		second.getVariables(vars);
+		return vars;
 	}
 
 }

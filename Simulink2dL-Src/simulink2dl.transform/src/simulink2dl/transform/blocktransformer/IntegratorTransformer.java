@@ -41,7 +41,7 @@ import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.ContinuousEvolution;
 import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
 import simulink2dl.dlmodel.hybridprogram.HybridProgramCollection;
-import simulink2dl.dlmodel.hybridprogram.SingleEvolution;
+import simulink2dl.dlmodel.hybridprogram.DifferentialEquation;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Disjunction;
 import simulink2dl.dlmodel.operator.formula.Formula;
@@ -157,7 +157,7 @@ public class IntegratorTransformer extends BlockTransformer {
 				Formula greaterEqualUpperLimit = new Relation(variable, RelationType.GREATER_EQUAL, upperLimitTerm);
 				Formula lessEqualUpperLimit = new Relation(variable, RelationType.LESS_EQUAL, upperLimitTerm);
 
-				ContinuousEvolution upperEvolution = new ContinuousEvolution(new SingleEvolution(variable, new RealTerm(0.0)));
+				ContinuousEvolution upperEvolution = new ContinuousEvolution(new DifferentialEquation(variable, new RealTerm(0.0)));
 				// set upper evolution domain
 				// evolution should not get above saturation limit and
 				// gain should be greater or equal to zero
@@ -179,7 +179,7 @@ public class IntegratorTransformer extends BlockTransformer {
 				Formula lessEqualLowerLimit = new Relation(variable, RelationType.LESS_EQUAL, lowerLimitTerm);
 				Formula greaterEqualLowerLimit = new Relation(variable, RelationType.GREATER_EQUAL, lowerLimitTerm);
 
-				ContinuousEvolution lowerEvolution = new ContinuousEvolution(new SingleEvolution(variable, new RealTerm(0.0)));
+				ContinuousEvolution lowerEvolution = new ContinuousEvolution(new DifferentialEquation(variable, new RealTerm(0.0)));
 				
 				// set lower evolution domain
 				// evolution should not get below saturation limit and
@@ -195,7 +195,7 @@ public class IntegratorTransformer extends BlockTransformer {
 			}
 				// handle evolution between saturation limits
 				ContinuousEvolution betweenEvolution = new ContinuousEvolution(
-						new SingleEvolution(variable, new PortIdentifier(connectedPortID)));
+						new DifferentialEquation(variable, new PortIdentifier(connectedPortID)));
 
 				// set between evolution domain
 				betweenEvolution.setEvolutionDomain(betweenLimitsFormula.createDeepCopy());
@@ -249,7 +249,7 @@ public class IntegratorTransformer extends BlockTransformer {
 		dlModel.addBehavior(resetChoiceProgram);
 
 		// evolution during reset
-		ContinuousEvolution resetEvolution = new ContinuousEvolution(new SingleEvolution(variable, new RealTerm(0.0)));
+		ContinuousEvolution resetEvolution = new ContinuousEvolution(new DifferentialEquation(variable, new RealTerm(0.0)));
 		resetEvolution.setEvolutionDomain(resetCondition);
 
 		// add reset evolution
@@ -258,7 +258,7 @@ public class IntegratorTransformer extends BlockTransformer {
 
 		// evolution without reset
 		ContinuousEvolution defaultEvolution = new ContinuousEvolution(
-				new SingleEvolution(variable, new PortIdentifier(connectedPortID)));
+				new DifferentialEquation(variable, new PortIdentifier(connectedPortID)));
 		defaultEvolution.setEvolutionDomain(noResetCondition);
 
 		// default evolution

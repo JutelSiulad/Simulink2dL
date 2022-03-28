@@ -107,26 +107,25 @@ public class ConditionalHybridProgram implements HybridProgram {
 	}
 
 	@Override
-	public void getBoundVariables(List<Variable> vars) {
-		choice.getBoundVariables(vars);
+	public List<Variable> getBoundVariables(List<Variable> vars) {
+		return choice.getBoundVariables(vars);
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
-		choice.getBoundVariables(vars);
-		
+	public List<Variable> getVariables(List<Variable> vars) {
+		vars.addAll(choice.getVariables(vars));
+		vars.addAll(condition.getVariables(vars));
+		return vars;
 	}
 
 	@Override
-	public List<HybridProgram> getInnerPrograms() {
-		LinkedList<HybridProgram> hps = new LinkedList<HybridProgram>();
+	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
 		hps.add(choice);
 		return hps;
 	}
 
 	@Override
-	public List<Term> getInnerTerms() {
-		LinkedList<Term> terms = new LinkedList<Term>();
+	public List<Term> getInnerTerms(List<Term> terms) {
 		terms.add(condition);
 		return terms;
 	}

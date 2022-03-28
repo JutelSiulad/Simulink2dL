@@ -183,9 +183,10 @@ public class ExponentTerm implements Term {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		base.getVariables(vars);
 		exponent.getVariables(vars);
+		return vars;
 	}
 
 }

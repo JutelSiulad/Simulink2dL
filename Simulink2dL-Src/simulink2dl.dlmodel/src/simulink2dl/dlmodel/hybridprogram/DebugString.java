@@ -73,22 +73,22 @@ public class DebugString implements HybridProgram {
 	}
 
 	@Override
-	public void getBoundVariables(List<Variable> vars) {
-		// do nothing
+	public List<Variable> getBoundVariables(List<Variable> vars) {
+		return vars;
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
-		// do nothing
+	public List<Variable> getVariables(List<Variable> vars) {
+		return vars;
 	}
 
 	@Override
-	public List<HybridProgram> getInnerPrograms() {
+	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
 		return new LinkedList<HybridProgram>();
 	}
 
 	@Override
-	public List<Term> getInnerTerms() {
+	public List<Term> getInnerTerms(List<Term> terms) {
 		return new LinkedList<Term>();
 	}
 	

@@ -214,10 +214,11 @@ public class Conjunction implements Formula {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		for (Operator element : elements) {
 			element.getVariables(vars);
 		}
+		return vars;
 	}
 
 }

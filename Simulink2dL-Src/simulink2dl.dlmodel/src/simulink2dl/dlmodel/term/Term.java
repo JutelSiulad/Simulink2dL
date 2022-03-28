@@ -45,6 +45,7 @@ public interface Term {
 	/**
 	 * Adds all variables contained in Term to vars (duplicates possible)
 	 * @param vars list of variables to add to
+	 * @return TODO
 	 */
-	public void getVariables(List<Variable> vars);
+	public List<Variable> getVariables(List<Variable> vars);
 }

@@ -177,14 +177,9 @@ public class DataInformation implements InvariantInformation {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		// TODO Auto-generated method stub
+		return vars;
 		
-	}
-
-	@Override
-	public List<Term> getInternalTerms() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

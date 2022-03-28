@@ -119,7 +119,7 @@ public class BracketTerm implements Term {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
-		innerTerm.getVariables(vars);
+	public List<Variable> getVariables(List<Variable> vars) {
+		return innerTerm.getVariables(vars);
 	}
 }

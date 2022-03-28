@@ -94,7 +94,7 @@ public class RealTerm implements Term {
 		return new RealTerm(value);
 	}
 
-	public void getVariables(List<Variable> vars) {
-		/* do nothing */
+	public List<Variable> getVariables(List<Variable> vars) {
+		return vars;
 	}
 }

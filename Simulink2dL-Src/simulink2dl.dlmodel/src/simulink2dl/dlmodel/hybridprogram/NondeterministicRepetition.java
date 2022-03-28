@@ -119,15 +119,13 @@ public class NondeterministicRepetition implements HybridProgram {
 	}
 
 	@Override
-	public List<HybridProgram> getInnerPrograms() {
-		LinkedList<HybridProgram> hps = new LinkedList<HybridProgram>();
+	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
 		hps.add(innerProgram);
 		return hps;
 	}
 
 	@Override
-	public List<Term> getInnerTerms() {
-		LinkedList<Term> terms = new LinkedList<Term>();
+	public List<Term> getInnerTerms(List<Term> terms) {
 		terms.add(invariant);
 		return terms;
 	}

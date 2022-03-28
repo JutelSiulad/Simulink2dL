@@ -98,10 +98,10 @@ public class ExistentialQuantifier implements Operator {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		variable.getVariables(vars);
 		innerOperator.getVariables(vars);
-		
+		return vars;
 	}
 
 }

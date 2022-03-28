@@ -84,20 +84,6 @@ public class IfStatement implements HybridProgram {
 	}
 
 	@Override
-	public boolean containsTerm(Term term) {
-		if (condition.containsTerm(term)) {
-			return true;
-		}
-		if (ifProgram.containsTerm(term)) {
-			return true;
-		}
-		if (elseProgram.containsTerm(term)) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
 	public IfStatement createDeepCopy() {
 		return new IfStatement(condition.createDeepCopy(), ifProgram.createDeepCopy(),
 				elseProgram != null ? elseProgram.createDeepCopy() : null);
@@ -131,16 +117,14 @@ public class IfStatement implements HybridProgram {
 
 
 	@Override
-	public List<HybridProgram> getInnerPrograms() {
-		LinkedList<HybridProgram> hps = new LinkedList<HybridProgram>();
+	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
 		hps.add(ifProgram);
 		hps.add(elseProgram);
 		return hps;
 	}
 
 	@Override
-	public List<Term> getInnerTerms() {
-		LinkedList<Term> terms = new LinkedList<Term>();
+	public List<Term> getInnerTerms(List<Term> terms) {
 		terms.add(condition);
 		return terms;
 	}

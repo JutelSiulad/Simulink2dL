@@ -65,9 +65,11 @@ public class HybridProgramCollection implements HybridProgram {
 		}
 	}
 
-	public List<HybridProgram> getInnerPrograms() {
-		return sequence;
+	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
+		hps.addAll(sequence);
+		return hps;
 	}
+
 	
 	public boolean isEmpty() {
 		return sequence.isEmpty();
@@ -142,8 +144,8 @@ public class HybridProgramCollection implements HybridProgram {
 	}
 
 	@Override
-	public List<Term> getInnerTerms() {
-		return new LinkedList<Term>();
+	public List<Term> getInnerTerms(List<Term> terms) {
+		return terms;
 	}
 
 }

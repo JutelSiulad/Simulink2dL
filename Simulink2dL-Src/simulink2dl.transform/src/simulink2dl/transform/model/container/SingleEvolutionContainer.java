@@ -28,7 +28,7 @@
  ******************************************************************************/
 package simulink2dl.transform.model.container;
 
-import simulink2dl.dlmodel.hybridprogram.SingleEvolution;
+import simulink2dl.dlmodel.hybridprogram.DifferentialEquation;
 import simulink2dl.dlmodel.operator.formula.Formula;
 
 /**
@@ -40,15 +40,15 @@ import simulink2dl.dlmodel.operator.formula.Formula;
  *
  */
 public class SingleEvolutionContainer {
-	private SingleEvolution evolution;
+	private DifferentialEquation evolution;
 	private Formula condition;
 
-	public SingleEvolutionContainer(SingleEvolution evolution, Formula condition) {
+	public SingleEvolutionContainer(DifferentialEquation evolution, Formula condition) {
 		this.evolution = evolution;
 		this.condition = condition;
 	}
 
-	public SingleEvolution getEvolution() {
+	public DifferentialEquation getEvolution() {
 		return evolution;
 	}
 

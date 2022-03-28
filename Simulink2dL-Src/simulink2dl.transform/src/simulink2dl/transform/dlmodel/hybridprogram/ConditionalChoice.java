@@ -161,26 +161,28 @@ public class ConditionalChoice implements HybridProgram {
 	}
 
 	@Override
-	public void getBoundVariables(List<Variable> vars) {
+	public List<Variable> getBoundVariables(List<Variable> vars) {
 		for (HybridProgram choice : choices) {
 			choice.getBoundVariables(vars);
 		}
+		return vars;
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		for (HybridProgram choice : choices) {
 			choice.getVariables(vars);
 		}
+		return vars;
 	}
 
 	@Override
-	public List<HybridProgram> getInnerPrograms() {
+	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
 		return new LinkedList<HybridProgram>(choices);
 	}
 
 	@Override
-	public List<Term> getInnerTerms() {
+	public List<Term> getInnerTerms(List<Term> terms) {
 		// TODO Auto-generated method stub
 		return null;
 	}

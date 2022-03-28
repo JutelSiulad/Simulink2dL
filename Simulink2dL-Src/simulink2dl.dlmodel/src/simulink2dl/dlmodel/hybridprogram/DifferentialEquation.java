@@ -29,6 +29,7 @@
 package simulink2dl.dlmodel.hybridprogram;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.term.Term;
@@ -42,7 +43,7 @@ import simulink2dl.util.PluginLogger;
  * @author Timm Liebrenz
  *
  */
-public class SingleEvolution  {
+public class DifferentialEquation implements Term{
 
 	private Variable variable;
 
@@ -54,7 +55,7 @@ public class SingleEvolution  {
 	 * @param variable
 	 * @param evolution
 	 */
-	public SingleEvolution(Variable variable, Term evolution) {
+	public DifferentialEquation(Variable variable, Term evolution) {
 		this.variable = variable;
 		this.evolution = evolution;
 	}
@@ -65,6 +66,10 @@ public class SingleEvolution  {
 	
 	public Term getEvolution() {
 		return evolution;
+	}
+	
+	public void setEvolution(Term evolution) {
+		this.evolution = evolution;
 	}
 
 	@Override
@@ -79,16 +84,16 @@ public class SingleEvolution  {
 		return evolution.containsTerm(term);
 	}
 
-	public SingleEvolution createDeepCopy() {
-		return new SingleEvolution(variable.createDeepCopy(), evolution.createDeepCopy());
+	public DifferentialEquation createDeepCopy() {
+		return new DifferentialEquation(variable.createDeepCopy(), evolution.createDeepCopy());
 	}
 	
 	/**
 	 * Generates a List of SingleEvolutions for each Variable-Term pair
 	 * @return list of evolutions of vector entries
 	 */
-	public LinkedList<SingleEvolution> expand() {
-		LinkedList<SingleEvolution> evolutions = new LinkedList<SingleEvolution>();
+	public LinkedList<DifferentialEquation> expand() {
+		LinkedList<DifferentialEquation> evolutions = new LinkedList<DifferentialEquation>();
 		if(variable.getSize()>0) {
 			VectorTerm vectorLeft = variable.getVector();
 			VectorTerm vectorRight = null;
@@ -100,7 +105,7 @@ public class SingleEvolution  {
 			
 			if (vectorRight != null && vectorLeft.size() == vectorRight.size()) {
 				for(int i = 0; i<variable.getSize();i++) {
-					evolutions.add(new SingleEvolution( (Variable)(vectorLeft.get(i)) , vectorRight.get(i) ));
+					evolutions.add(new DifferentialEquation( (Variable)(vectorLeft.get(i)) , vectorRight.get(i) ));
 				}
 			} else {
 				PluginLogger.error("Vector expansion of " + this.getClass().toString()+ " failed: size of variable != size of assignment");
@@ -109,5 +114,32 @@ public class SingleEvolution  {
 			evolutions.add(this);
 		}
 		return evolutions;
+	}
+
+	public List<Term> getInnerTerms() {
+		LinkedList<Term> terms = new LinkedList<Term>();
+		terms.add(variable);
+		terms.add(evolution);
+		return terms;
+	}
+
+	@Override
+	public void replaceTermRecursive(Term toReplace, Term replaceWith) {
+		if(evolution.equals(toReplace)) {
+			evolution = replaceWith;
+		}
+	}
+
+	@Override
+	public boolean isAtomic() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public List<Variable> getVariables(List<Variable> vars) {
+		variable.getVariables(vars);
+		evolution.getVariables(vars);
+		return vars;
 	}
 }

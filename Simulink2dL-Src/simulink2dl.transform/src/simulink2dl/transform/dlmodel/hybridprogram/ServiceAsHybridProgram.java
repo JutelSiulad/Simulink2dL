@@ -35,7 +35,7 @@ public class ServiceAsHybridProgram extends HybridProgramCollection {
 	
 	public ServiceAsHybridProgram(HybridProgramCollection hybridProgramCollection) {
 		super();
-		for(HybridProgram element : hybridProgramCollection.getInnerPrograms()) {
+		for(HybridProgram element : hybridProgramCollection.getInnerPrograms(null)) {
 			this.addElement(element.createDeepCopy());
 		}
 	}

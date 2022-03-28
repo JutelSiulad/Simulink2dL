@@ -151,8 +151,9 @@ public class Implication implements Formula {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		antecedent.getVariables(vars);
 		consequent.getVariables(vars);
+		return vars;
 	}
 }

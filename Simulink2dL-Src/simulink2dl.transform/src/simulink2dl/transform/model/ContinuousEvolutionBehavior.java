@@ -34,7 +34,7 @@ import java.util.List;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.ContinuousEvolution;
 import simulink2dl.dlmodel.hybridprogram.HybridProgram;
-import simulink2dl.dlmodel.hybridprogram.SingleEvolution;
+import simulink2dl.dlmodel.hybridprogram.DifferentialEquation;
 import simulink2dl.dlmodel.operator.formula.BooleanConstant;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Disjunction;
@@ -71,7 +71,7 @@ public class ContinuousEvolutionBehavior {
 	 * 
 	 * @param evolution
 	 */
-	public void addNewSingleEvolution(SingleEvolution evolution) {
+	public void addNewSingleEvolution(DifferentialEquation evolution) {
 		if (evolutions.isEmpty()) {
 			ContinuousEvolution newEvolution = new ContinuousEvolution();
 			newEvolution.addSingleEvolution(evolution);
@@ -115,7 +115,7 @@ public class ContinuousEvolutionBehavior {
 
 				newEvolution.setEvolutionDomain(newEvolutionDomain);
 
-				for (SingleEvolution toAddSingleEvolution : toAddEvolution.getEvolutionFormulas()) {
+				for (DifferentialEquation toAddSingleEvolution : toAddEvolution.getEvolutionFormulas()) {
 					newEvolution.addSingleEvolution(toAddSingleEvolution);
 				}
 

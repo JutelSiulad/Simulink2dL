@@ -112,8 +112,9 @@ public class DiamondModality implements Operator {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
-		/* todo hp.getVariables */
-		postCondition.getVariables(vars);		
+	public List<Variable> getVariables(List<Variable> vars) {
+		innerProgram.getVariables(vars);
+		postCondition.getVariables(vars);
+		return vars;
 	}
 }

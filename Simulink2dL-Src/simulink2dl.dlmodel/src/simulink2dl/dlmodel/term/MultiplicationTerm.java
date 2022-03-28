@@ -260,13 +260,14 @@ public class MultiplicationTerm implements Term {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		for (Term factor : factors) {
 			factor.getVariables(vars);
 		}
 		for (Term divisor : divisors) {
 			divisor.getVariables(vars);
 		}
+		return vars;
 	}
 
 }

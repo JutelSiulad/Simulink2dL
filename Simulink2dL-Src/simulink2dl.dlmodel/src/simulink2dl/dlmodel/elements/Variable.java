@@ -142,8 +142,9 @@ public class Variable extends ResizableTerm implements ReplaceableTerm{
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		vars.add(this);
+		return vars;
 	}
 
 }

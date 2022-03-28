@@ -45,7 +45,7 @@ import simulink2dl.dlmodel.term.Term;
  */
 public class ContinuousEvolution implements HybridProgram {
 
-	private List<SingleEvolution> evolutionFormulas;
+	private List<DifferentialEquation> differentialEquations;
 
 	private Formula evolutionDomain;
 
@@ -53,7 +53,7 @@ public class ContinuousEvolution implements HybridProgram {
 	 * Constructor without given evolutions.
 	 */
 	public ContinuousEvolution() {
-		this.evolutionFormulas = new LinkedList<SingleEvolution>();
+		this.differentialEquations = new LinkedList<DifferentialEquation>();
 		this.evolutionDomain = new BooleanConstant(true);
 	}
 
@@ -62,10 +62,10 @@ public class ContinuousEvolution implements HybridProgram {
 	 * 
 	 * @param newEvolutions
 	 */
-	public ContinuousEvolution(SingleEvolution... newEvolutions) {
-		this.evolutionFormulas = new LinkedList<SingleEvolution>();
-		for (SingleEvolution newEvolution : newEvolutions) {
-			this.evolutionFormulas.add(newEvolution);
+	public ContinuousEvolution(DifferentialEquation... newEvolutions) {
+		this.differentialEquations = new LinkedList<DifferentialEquation>();
+		for (DifferentialEquation newEvolution : newEvolutions) {
+			this.differentialEquations.add(newEvolution);
 		}
 		this.evolutionDomain = null;
 	}
@@ -76,10 +76,10 @@ public class ContinuousEvolution implements HybridProgram {
 	 * @param evolutionDomain
 	 * @param newEvolutions
 	 */
-	public ContinuousEvolution(Formula evolutionDomain, SingleEvolution... newEvolutions) {
-		this.evolutionFormulas = new LinkedList<SingleEvolution>();
-		for (SingleEvolution newEvolution : newEvolutions) {
-			this.evolutionFormulas.add(newEvolution);
+	public ContinuousEvolution(Formula evolutionDomain, DifferentialEquation... newEvolutions) {
+		this.differentialEquations = new LinkedList<DifferentialEquation>();
+		for (DifferentialEquation newEvolution : newEvolutions) {
+			this.differentialEquations.add(newEvolution);
 		}
 		this.evolutionDomain = evolutionDomain;
 	}
@@ -90,8 +90,8 @@ public class ContinuousEvolution implements HybridProgram {
 	 * @param variable
 	 * @param term
 	 */
-	public void addSingleEvolution(SingleEvolution evolutionTerm) {
-		evolutionFormulas.add(evolutionTerm);
+	public void addSingleEvolution(DifferentialEquation evolutionTerm) {
+		differentialEquations.add(evolutionTerm);
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class ContinuousEvolution implements HybridProgram {
 	 * @param term
 	 */
 	public void addSingleEvolution(Variable variable, Term term) {
-		evolutionFormulas.add(new SingleEvolution(variable, term));
+		differentialEquations.add(new DifferentialEquation(variable, term));
 	}
 
 	/**
@@ -123,15 +123,15 @@ public class ContinuousEvolution implements HybridProgram {
 		this.evolutionDomain = newEvolutionDomain;
 	}
 
-	public List<SingleEvolution> getEvolutionFormulas() {
-		return evolutionFormulas;
+	public List<DifferentialEquation> getEvolutionFormulas() {
+		return differentialEquations;
 	}
 
 	@Override
 	public String toString() {
 		String evolutionString = "";
 		boolean isFirst = true;
-		for (SingleEvolution formula : evolutionFormulas) {
+		for (DifferentialEquation formula : differentialEquations) {
 			if (!isFirst) {
 				evolutionString += ",";
 			} else {
@@ -150,7 +150,7 @@ public class ContinuousEvolution implements HybridProgram {
 	public String toStringFormatted(String indent, boolean multiLineTestFormulas, boolean multiLineEvolutionDomains) {
 		String evolutionString = "";
 		boolean isFirst = true;
-		for (SingleEvolution formula : evolutionFormulas) {
+		for (DifferentialEquation formula : differentialEquations) {
 			if (!isFirst) {
 				evolutionString += ",\n" + indent + "  ";
 			} else {
@@ -170,12 +170,12 @@ public class ContinuousEvolution implements HybridProgram {
 		return "{\n" + indent + "  " + evolutionString + "\n" + indent + "&" + evolutionDomainString + "\n" + indent
 				+ "}";
 	}
-
+	
 	@Override
 	public ContinuousEvolution createDeepCopy() {
 		ContinuousEvolution result = new ContinuousEvolution(evolutionDomain.createDeepCopy());
 
-		for (SingleEvolution singleEvolution : evolutionFormulas) {
+		for (DifferentialEquation singleEvolution : differentialEquations) {
 			result.addSingleEvolution(singleEvolution.createDeepCopy());
 		}
 
@@ -184,35 +184,39 @@ public class ContinuousEvolution implements HybridProgram {
 
 	@Override
 	public HybridProgram expand() {
-		List<SingleEvolution> expandedEvolutionFormulas = new LinkedList<SingleEvolution>();
-		/*evolutionDomain = (Formula) evolutionDomain.expand();*/
-		for (SingleEvolution evolution : evolutionFormulas) {
-			LinkedList<SingleEvolution> expandedEvolutions = evolution.expand();
-			for(SingleEvolution expandedEvolution : expandedEvolutions) {
+		List<DifferentialEquation> expandedEvolutionFormulas = new LinkedList<DifferentialEquation>();
+		for (DifferentialEquation evolution : differentialEquations) {
+			LinkedList<DifferentialEquation> expandedEvolutions = evolution.expand();
+			for(DifferentialEquation expandedEvolution : expandedEvolutions) {
 				expandedEvolutionFormulas.add(expandedEvolution);
 			}
 		}
-		evolutionFormulas = expandedEvolutionFormulas;
+		differentialEquations = expandedEvolutionFormulas;
 		return this;
 	}
 
 	@Override
-	public void getBoundVariables(List<Variable> vars) {
-		for (SingleEvolution evolution : evolutionFormulas) {
-				evolution.getVariable().getVariables(vars);
+	public List<Variable> getBoundVariables(List<Variable> vars) {
+		for (DifferentialEquation evolution : differentialEquations) {
+			Variable cvar = evolution.getVariable();
+			if(!vars.contains(evolution.getVariable())) {
+				cvar.getVariables(vars);
+			}
 		}
+		return vars;
 	}
 
 	@Override
-	public List<HybridProgram> getInnerPrograms() {
+	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
 		return new LinkedList<HybridProgram>();
 	}
 
 	@Override
-	public List<Term> getInnerTerms() {
-		LinkedList<Term> terms = new LinkedList<Term>();
+	public List<Term> getInnerTerms(List<Term> terms) {
 		terms.add(evolutionDomain);
+		terms.addAll(differentialEquations);
 		return terms;
 	}
+	
 
 }

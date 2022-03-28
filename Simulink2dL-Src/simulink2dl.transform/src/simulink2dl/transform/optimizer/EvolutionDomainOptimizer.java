@@ -33,7 +33,7 @@ import java.util.List;
 
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.ContinuousEvolution;
-import simulink2dl.dlmodel.hybridprogram.SingleEvolution;
+import simulink2dl.dlmodel.hybridprogram.DifferentialEquation;
 import simulink2dl.dlmodel.operator.Operator;
 import simulink2dl.dlmodel.operator.formula.BooleanConstant;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
@@ -54,7 +54,7 @@ public class EvolutionDomainOptimizer extends Optimizer {
 	protected void handleContinuousEvolution(ContinuousEvolution continuousEvolution) {
 		List<Variable> evolutionVariables = new LinkedList<Variable>();
 
-		for (SingleEvolution evolution : continuousEvolution.getEvolutionFormulas()) {
+		for (DifferentialEquation evolution : continuousEvolution.getEvolutionFormulas()) {
 			evolutionVariables.add(evolution.getVariable());
 		}
 

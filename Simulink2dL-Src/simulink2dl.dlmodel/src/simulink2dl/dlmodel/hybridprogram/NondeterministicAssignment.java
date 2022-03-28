@@ -90,18 +90,20 @@ public class NondeterministicAssignment implements HybridProgram {
 	}
 
 	@Override
-	public void getBoundVariables(List<Variable> vars) {
-		vars.add(variable);
+	public List<Variable> getBoundVariables(List<Variable> vars) {
+		if(!vars.contains(variable)) {
+			vars.add(variable);
+		}
+		return vars;
 	}
 
 	@Override
-	public List<HybridProgram> getInnerPrograms() {
-		return new LinkedList<HybridProgram>();
+	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
+		return hps;
 	}
 
 	@Override
-	public List<Term> getInnerTerms() {
-		LinkedList<Term> terms = new LinkedList<Term>();
+	public List<Term> getInnerTerms(List<Term> terms) {
 		terms.add(variable);
 		return terms;
 	}

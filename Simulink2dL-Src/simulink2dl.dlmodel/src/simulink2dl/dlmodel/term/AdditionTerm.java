@@ -213,10 +213,11 @@ public class AdditionTerm implements Term {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		for (Term summand : summands) {
 			summand.getVariables(vars);
 		}
+		return vars;
 	}
 
 }

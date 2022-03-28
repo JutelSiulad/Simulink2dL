@@ -134,13 +134,14 @@ public class NondeterministicChoice implements HybridProgram {
 	}
 
 	@Override
-	public List<HybridProgram> getInnerPrograms() {
+	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
+		hps.addAll(choices);
 		return choices;
 	}
 
 	@Override
-	public List<Term> getInnerTerms() {
-		return new LinkedList<Term>();
+	public List<Term> getInnerTerms(List<Term> terms) {
+		return terms;
 	}
 
 }

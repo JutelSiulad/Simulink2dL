@@ -331,8 +331,9 @@ public class Relation implements Formula {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		leftSide.getVariables(vars);
 		rightSide.getVariables(vars);
+		return vars;
 	}
 }

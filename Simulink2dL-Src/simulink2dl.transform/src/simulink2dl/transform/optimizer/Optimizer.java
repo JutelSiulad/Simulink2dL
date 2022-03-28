@@ -28,6 +28,8 @@
  ******************************************************************************/
 package simulink2dl.transform.optimizer;
 
+import java.util.LinkedList;
+
 import simulink2dl.dlmodel.hybridprogram.ContinuousEvolution;
 import simulink2dl.dlmodel.hybridprogram.DebugString;
 import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
@@ -58,7 +60,7 @@ public abstract class Optimizer {
 	}
 
 	private void iterateCollection(HybridProgramCollection hpCollection) {
-		for (HybridProgram program : hpCollection.getInnerPrograms()) {
+		for (HybridProgram program : hpCollection.getInnerPrograms(new LinkedList<HybridProgram>())) {
 			handleSingleProgram(program);
 		}
 	}

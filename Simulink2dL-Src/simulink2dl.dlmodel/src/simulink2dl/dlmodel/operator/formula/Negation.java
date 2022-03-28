@@ -125,7 +125,8 @@ public class Negation implements Formula {
 	}
 
 	@Override
-	public void getVariables(List<Variable> vars) {
+	public List<Variable> getVariables(List<Variable> vars) {
 		innerOperator.getVariables(vars);
+		return vars;
 	}
 }

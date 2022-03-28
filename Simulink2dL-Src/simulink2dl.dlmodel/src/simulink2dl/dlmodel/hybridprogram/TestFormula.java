@@ -85,13 +85,12 @@ public class TestFormula implements HybridProgram {
 	}
 
 	@Override
-	public List<HybridProgram> getInnerPrograms() {
+	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
 		return new LinkedList<HybridProgram>();
 	}
 
 	@Override
-	public List<Term> getInnerTerms() {
-		LinkedList<Term> terms = new LinkedList<Term>();
+	public List<Term> getInnerTerms(List<Term> terms) {
 		terms.add(formula);
 		return terms;
 	}

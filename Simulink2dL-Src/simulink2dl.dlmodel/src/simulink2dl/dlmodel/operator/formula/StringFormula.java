@@ -103,7 +103,7 @@ public class StringFormula implements Formula {
 	}
 	
 	@Override
-	public void getVariables(List<Variable> vars) {
-		/* do nothing */
+	public List<Variable> getVariables(List<Variable> vars) {
+		return vars;
 	}
 }

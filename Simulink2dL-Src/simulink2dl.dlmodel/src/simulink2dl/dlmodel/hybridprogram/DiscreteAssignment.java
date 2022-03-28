@@ -78,6 +78,13 @@ public class DiscreteAssignment implements HybridProgram {
 	}
 
 	@Override
+	public void replaceTermRecursive(Term toReplace, Term replaceWith) {
+		if(assignmentTerm.equals(toReplace)) {
+			assignmentTerm = replaceWith;
+		}
+	}
+	
+	@Override
 	public DiscreteAssignment createDeepCopy() {
 		return new DiscreteAssignment(variable.createDeepCopy(), assignmentTerm.createDeepCopy());
 	}
@@ -121,19 +128,22 @@ public class DiscreteAssignment implements HybridProgram {
 	}
 
 	@Override
-	public void getBoundVariables(List<Variable> vars) {
-		variable.getVariables(vars);
+	public List<Variable> getBoundVariables(List<Variable> vars) {
+		if(!vars.contains(variable)) {
+			variable.getVariables(vars);
+		}
+		return vars;
 	}
 
 	@Override
-	public List<HybridProgram> getInnerPrograms() {
+	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
 		return new LinkedList<HybridProgram>();
 	}
 
 	@Override
-	public List<Term> getInnerTerms() {
-		LinkedList<Term> terms = new LinkedList<Term>();
-		terms.add(variable); terms.add(assignmentTerm);
+	public List<Term> getInnerTerms(List<Term> terms) {
+		terms.add(variable); 
+		terms.add(assignmentTerm);
 		return terms;
 	}
 }
