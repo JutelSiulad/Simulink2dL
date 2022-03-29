@@ -28,12 +28,12 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.contracts.hardcoded.RLFactory;
 
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.formula.BooleanConstant;
 
 
-public class RewardContract extends HybridContract {
+public class RewardContract extends DiscreteHybridContract {
 	/* Reward is transformed to an empty true->true contract */
 	public RewardContract(String serviceName) {
 		

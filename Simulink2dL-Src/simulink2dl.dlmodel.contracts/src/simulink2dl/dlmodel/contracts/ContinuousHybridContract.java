@@ -28,8 +28,8 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.contracts;
 
-public class ConcurrentContract extends HybridContract{
-	public ConcurrentContract() {
+public class ContinuousHybridContract extends HybridContract{
+	public ContinuousHybridContract() {
 		super();
 	}
 }

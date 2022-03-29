@@ -29,13 +29,13 @@
 package simulink2dl.dlmodel.contracts;
 
 /**
- * A contract that is embedded in a choice program, which models discrete sampling intervals
+ * A contract which is evaluated in discrete sampling intervals.
  *
  */
-public class DiscreteContract extends HybridContract {
+public class TimedContract extends DiscreteHybridContract {
 	String samplingTime;
 
-	public DiscreteContract(String samplingTime) {
+	public TimedContract(String samplingTime) {
 		super();
 		this.setSamplingTime(samplingTime);
 	}

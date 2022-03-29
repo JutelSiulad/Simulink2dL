@@ -28,12 +28,12 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.contracts.hardcoded.RLFactory;
 
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.formula.BooleanConstant;
 
 
-public class GoalTrackerContract extends HybridContract {
+public class GoalTrackerContract extends DiscreteHybridContract {
 	/* Goal Tracker is transformed to an empty true->true contract */
 	public GoalTrackerContract(String serviceName) {
 		

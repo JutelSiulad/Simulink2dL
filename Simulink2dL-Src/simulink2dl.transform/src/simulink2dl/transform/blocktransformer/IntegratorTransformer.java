@@ -51,7 +51,7 @@ import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalChoice;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalHybridProgram;
 import simulink2dl.transform.macro.Macro;
@@ -63,7 +63,7 @@ import simulink2dl.util.parser.StringParser;
 
 public class IntegratorTransformer extends BlockTransformer {
 
-	public IntegratorTransformer(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
+	public IntegratorTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 

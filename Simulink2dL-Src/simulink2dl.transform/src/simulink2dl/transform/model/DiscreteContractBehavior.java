@@ -33,15 +33,15 @@ import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.operator.formula.Relation.RelationType;
 import simulink2dl.dlmodel.term.RealTerm;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.util.parser.StringParser;
 
-public class DiscreteContractBehavior extends DiscreteBehavior{
+public class DiscreteContractBehavior extends TimedBehavior{
 
 	public DiscreteContractBehavior(String stepSize) {
 		super(stepSize);
 	}
-	public void addDiscreteContract(DLModelSimulink dlModel) {
+	public void addDiscreteContract(DLModelFromSimulink dlModel) {
 		addStepTimeReset();
 		
 		Constant stepSizeConstant = getStepSizeConstant();
@@ -64,9 +64,9 @@ public class DiscreteContractBehavior extends DiscreteBehavior{
 		dlModel.addContinuousEvolution(stepClock, new RealTerm(1.0));
 
 		dlModel.addBehavior(getStepChoice());
-		dlModel.addDiscreteBehavior(this);
+		dlModel.addTimedBehavior(this);
 	}
-	public void addToModel(DLModelSimulink dlModel) {
+	public void addToModel(DLModelFromSimulink dlModel) {
 		// do nothing
 	}
 	

@@ -28,13 +28,13 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.contracts.hardcoded.RLFactory;
 
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.term.AdditionTerm;
 import simulink2dl.dlmodel.term.MultiplicationTerm;
 
-public class EvasiveMoveChooserContract  extends HybridContract{
+public class EvasiveMoveChooserContract  extends DiscreteHybridContract{
 	/* Evasive Move chooser outputs a move with dotproduct of (VXEM,VYEM) and the position vector of the opponent = 0*/
 	public EvasiveMoveChooserContract(String serviceName) {
 		super();

@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 import simulink2dl.dlmodel.DLModel;
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
@@ -42,7 +42,7 @@ import simulink2dl.dlmodel.term.AdditionTerm;
 import simulink2dl.dlmodel.term.MultiplicationTerm;
 import simulink2dl.dlmodel.term.Term;
 
-public class RobotSensorContract extends HybridContract {
+public class RobotSensorContract extends DiscreteHybridContract {
 	
 	//in and outputs for current contract
 	Variable XOpp;

@@ -73,10 +73,6 @@ public class DLModelDefaultStructure extends DLModel {
 		behavior.addElement(newBehavior);
 	}
 
-	public void addBehaviorFront(HybridProgram newBehavior) {
-		behavior.addElementFront(newBehavior);
-	}
-
 	public HybridProgramCollection getBehavior() {
 		return behavior;
 	}

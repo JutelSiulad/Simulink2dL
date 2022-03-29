@@ -28,7 +28,7 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.contracts.hardcoded.RLFactory;
 
-import simulink2dl.dlmodel.contracts.ConcurrentContract;
+import simulink2dl.dlmodel.contracts.ContinuousHybridContract;
 import simulink2dl.dlmodel.contracts.GhostVariable;
 import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
@@ -38,7 +38,7 @@ import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.term.AdditionTerm;
 import simulink2dl.dlmodel.term.MultiplicationTerm;
 
-public class OpponentEvasionContract extends ConcurrentContract{
+public class OpponentEvasionContract extends ContinuousHybridContract{
 		
 		public OpponentEvasionContract(String serviceName) {
 			super();

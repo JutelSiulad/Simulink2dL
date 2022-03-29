@@ -46,7 +46,7 @@ import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.transform.macro.ConditionalMacro;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.MacroContainer;
@@ -54,7 +54,7 @@ import simulink2dl.transform.macro.SimpleMacro;
 
 public class MultiPortSwitchTransformer extends BlockTransformer {
 
-	public MultiPortSwitchTransformer(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
+	public MultiPortSwitchTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 

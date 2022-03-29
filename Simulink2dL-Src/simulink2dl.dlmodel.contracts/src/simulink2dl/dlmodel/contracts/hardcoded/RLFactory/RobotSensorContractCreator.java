@@ -32,11 +32,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import simulink2dl.dlmodel.DLModel;
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 
 public abstract class RobotSensorContractCreator {
 	
-	public static List<HybridContract> getContractsForSensor(DLModel model, String serviceName, boolean cutoff) {
+	public static List<DiscreteHybridContract> getContractsForSensor(DLModel model, String serviceName, boolean cutoff) {
 		String[] subsensors;
 		serviceName=serviceName.replace("RL", "");
 		serviceName=serviceName.replace("Service", "");
@@ -55,14 +55,14 @@ public abstract class RobotSensorContractCreator {
 			String[] opps = {"A","B"};
 			subsensors = opps;
 		}
-		List<HybridContract> contracts = new LinkedList<HybridContract>();
+		List<DiscreteHybridContract> contracts = new LinkedList<DiscreteHybridContract>();
 		for(String sub : subsensors) {
 			contracts.add(new RobotSensorContract(model, cutoff, sub, subsensors));
 		}
 		return contracts;
 	}
 	
-	public static HybridContract getContractForSubSensor(DLModel model, String serviceName, boolean cutoff) {
+	public static DiscreteHybridContract getContractForSubSensor(DLModel model, String serviceName, boolean cutoff) {
 		serviceName=serviceName.replace("RL", "");
 		serviceName=serviceName.replace("Service", "");
 		serviceName=serviceName.replace("RobotSensorSubsystem", "");

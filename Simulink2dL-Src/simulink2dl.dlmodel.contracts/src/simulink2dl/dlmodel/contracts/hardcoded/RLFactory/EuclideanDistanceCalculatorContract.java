@@ -28,11 +28,11 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.contracts.hardcoded.RLFactory;
 
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.formula.Relation;
 
-public class EuclideanDistanceCalculatorContract extends HybridContract{
+public class EuclideanDistanceCalculatorContract extends DiscreteHybridContract{
 	/* EuclideanDistanceCalculator outputs the euclidean distance of the input positions */
 	public EuclideanDistanceCalculatorContract(String serviceName) {
 		super();

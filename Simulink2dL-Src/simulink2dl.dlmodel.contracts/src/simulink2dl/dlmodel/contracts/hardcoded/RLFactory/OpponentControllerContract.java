@@ -28,7 +28,7 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.contracts.hardcoded.RLFactory;
 
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Implication;
@@ -39,7 +39,7 @@ import simulink2dl.dlmodel.term.MultiplicationTerm;
 import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.Term;
 
-public class OpponentControllerContract extends HybridContract{
+public class OpponentControllerContract extends DiscreteHybridContract{
 	
 	public OpponentControllerContract(String serviceName) {
 		String oppName = serviceName;

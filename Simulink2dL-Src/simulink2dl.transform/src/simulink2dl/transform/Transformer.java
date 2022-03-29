@@ -44,10 +44,11 @@ import org.conqat.lib.simulink.model.SimulinkBlock;
 import org.conqat.lib.simulink.model.SimulinkModel;
 
 import simulink2dl.dlmodel.DLModel;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.contracts.HybridContract;
 import simulink2dl.transform.blocktransformer.BlockTransformer;
 import simulink2dl.transform.blocktransformer.TransformerFactory;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.transform.optimizer.ConditionalChoiceOptimizer;
 import simulink2dl.transform.optimizer.ContradictionOptimizer;
 import simulink2dl.transform.optimizer.EvolutionDomainOptimizer;
@@ -66,19 +67,19 @@ public class Transformer {
 
 	private SimulinkModel simulinkModel;
 
-	private DLModelSimulink dlModel;
+	private DLModelFromSimulink modelHandler;
 
 	private Environment environment;
 
 	private Set<String> lastBlocks;
 
-	private Set<HybridContract> transformationContracts;
+	private Set<DiscreteHybridContract> transformationContracts;
 
-	public Transformer(SimulinkModel model, Set<HybridContract> contracts) {
+	public Transformer(SimulinkModel model, Set<DiscreteHybridContract> contracts) {
 		this.simulinkModel = model;
-		this.dlModel = new DLModelSimulink();
+		this.modelHandler = new DLModelFromSimulink();
 
-		this.environment = new Environment(dlModel, model, contracts);
+		this.environment = new Environment(modelHandler, model, contracts);
 
 		lastBlocks = new HashSet<String>();
 
@@ -97,8 +98,8 @@ public class Transformer {
 		return this.simulinkModel;
 	}
 
-	public DLModelSimulink getDLModel() {
-		return this.dlModel;
+	public DLModelFromSimulink getDLModel() {
+		return this.modelHandler;
 	}
 
 	public Environment getEnvironment() {
@@ -123,7 +124,7 @@ public class Transformer {
 		}
 
 		List<String> conIds = new LinkedList<String>();
-		for (HybridContract cntrct : this.transformationContracts) {
+		for (DiscreteHybridContract cntrct : this.transformationContracts) {
 			conIds.add(cntrct.getId());
 		}
 
@@ -179,7 +180,7 @@ public class Transformer {
 
 		// transform model
 		for (SimulinkBlock block : blockList) {
-			BlockTransformer blockTransformer = transformerFactory.getBlockTransformer(block, simulinkModel, dlModel, environment);
+			BlockTransformer blockTransformer = transformerFactory.getBlockTransformer(block, simulinkModel, modelHandler, environment);
 			if (selectedHandler.contains("Controlflow")) {
 				blockTransformer.setHandleControlFlow(true);
 			}
@@ -189,28 +190,28 @@ public class Transformer {
 	}
 
 	public void finalizeTransform() {
-		dlModel.finalizeModel(environment);
+		modelHandler.finalizeModel(environment);
 	}
 
 	public void optimize(Set<String> selectedOptimizer) {
 		if (selectedOptimizer.contains("ConditionalChoice")) {
 			Optimizer condChoiceOptimizer = new ConditionalChoiceOptimizer();
-			condChoiceOptimizer.run(dlModel);
+			condChoiceOptimizer.run(modelHandler);
 		}
 
 		if (selectedOptimizer.contains("Formula")) {
 			Optimizer formulaOptimizer = new FormulaOptimizer();
-			formulaOptimizer.run(dlModel);
+			formulaOptimizer.run(modelHandler);
 		}
 
 		if (selectedOptimizer.contains("Contradiction")) {
 			Optimizer contradictionOptimizer = new ContradictionOptimizer();
-			contradictionOptimizer.run(dlModel);
+			contradictionOptimizer.run(modelHandler);
 		}
 
 		if (selectedOptimizer.contains("EvolutionDomain")) {
 			Optimizer evolutionDomainOptimizer = new EvolutionDomainOptimizer();
-			evolutionDomainOptimizer.run(dlModel);
+			evolutionDomainOptimizer.run(modelHandler);
 		}
 	}
 
@@ -219,7 +220,7 @@ public class Transformer {
 	 */
 	public void writeOut(String pathToFile) {
 		// check whether a transformed model is present
-		if (dlModel == null) {
+		if (modelHandler == null) {
 			PluginLogger.error("Tried to write model when no model is created");
 			return;
 		}
@@ -233,7 +234,7 @@ public class Transformer {
 			PluginLogger.info("path to file: " + pathToFile);
 
 			// write the transformed model into the file
-			writer.write(dlModel.createOutputString(Constants.writeMultiLineTestFormulas,
+			writer.write(modelHandler.createOutputString(Constants.writeMultiLineTestFormulas,
 					Constants.writeMultiLineEvolutionDomains));
 
 			// close the writer
@@ -251,7 +252,7 @@ public class Transformer {
 	 * @param pathToFile
 	 */
 	public void writeOutContracts(String pathToFile) {
-		List<HybridContract> rLContracts = dlModel.getRLContracts();
+		List<HybridContract> rLContracts = modelHandler.getRLContracts();
 		for(int i = 0; i<rLContracts.size(); i++) {
 			Writer writer;
 			try {

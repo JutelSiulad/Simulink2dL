@@ -10,13 +10,13 @@ import org.conqat.lib.simulink.model.SimulinkOutPort;
 import simulink2dl.dlmodel.term.MinMaxTerm;
 import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
 
 public class MinMaxTransformer  extends BlockTransformer {
 
-	public MinMaxTransformer(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
+	public MinMaxTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 

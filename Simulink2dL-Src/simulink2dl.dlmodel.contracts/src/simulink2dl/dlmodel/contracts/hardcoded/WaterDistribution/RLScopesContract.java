@@ -28,12 +28,12 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution;
 
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.formula.BooleanConstant;
 
 
-public class RLScopesContract extends HybridContract {
+public class RLScopesContract extends DiscreteHybridContract {
 	/* Simulation Info is transformed to an empty true->true contract */
 	public RLScopesContract(String serviceName) {
 		

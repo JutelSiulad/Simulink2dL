@@ -29,6 +29,7 @@
 package simulink2dl.dlmodel.contracts;
 
 import simulink2dl.dlmodel.elements.Variable;
+import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
 import simulink2dl.dlmodel.term.Term;
 /**
  * Variable that acts as a ghost variable for another term
@@ -45,6 +46,9 @@ public class GhostVariable extends Variable {
 		assignedTerm = term;
 	}
 
+	public DiscreteAssignment getGhostAssignment() {
+		return new DiscreteAssignment(this,assignedTerm);
+	}
 	private Term assignedTerm;
 	
 	public Term getAssignedTerm() {

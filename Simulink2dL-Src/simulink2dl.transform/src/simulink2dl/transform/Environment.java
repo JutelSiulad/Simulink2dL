@@ -40,7 +40,7 @@ import org.conqat.lib.simulink.model.SimulinkModel;
 import org.conqat.lib.simulink.model.SimulinkOutPort;
 import org.conqat.lib.simulink.model.SimulinkPortBase;
 
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
@@ -54,7 +54,7 @@ import simulink2dl.dlmodel.term.AdditionTerm;
 import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.util.PluginLogger;
 import simulink2dl.util.simulink_transformer.PortMapping;
 
@@ -68,11 +68,11 @@ import simulink2dl.util.simulink_transformer.PortMapping;
  */
 public class Environment {
 
-	private DLModelSimulink dlModel;
+	private DLModelFromSimulink dlModel;
 
 	private SimulinkModel simulinkModel;
 
-	private Set<HybridContract> contracts;
+	private Set<DiscreteHybridContract> contracts;
 
 	private boolean useSmallStep;
 	private boolean useEpsilon;
@@ -87,7 +87,7 @@ public class Environment {
 	/**
 	 * Private constructor
 	 */
-	public Environment(DLModelSimulink dlModel, SimulinkModel simulinkModel, Set<HybridContract> contracts) {
+	public Environment(DLModelFromSimulink dlModel, SimulinkModel simulinkModel, Set<DiscreteHybridContract> contracts) {
 		this.dlModel = dlModel;
 		this.simulinkModel = simulinkModel;
 		this.contracts = contracts;
@@ -182,7 +182,7 @@ public class Environment {
 
 			// add reset of small step variable
 			DiscreteAssignment reset = new DiscreteAssignment(smallStep, new RealTerm(0.0));
-			dlModel.addBehaviorFront(reset);
+			dlModel.addToSmallstepReset(reset);
 
 			// add small step to all evolution domains
 			Formula evolutionDomain = new Relation(smallStep, Relation.RelationType.LESS_EQUAL, stepSize);
@@ -209,7 +209,7 @@ public class Environment {
 			Formula epsilonBounds = new Conjunction(lowerBound, upperBound);
 			epsilonAssignment.addElement(new TestFormula(epsilonBounds));
 
-			dlModel.addBehaviorFront(epsilonAssignment);
+			dlModel.addToSmallstepReset(epsilonAssignment);
 		}
 	}
 
@@ -265,7 +265,7 @@ public class Environment {
 	/**
 	 * @return the contracts
 	 */
-	public Set<HybridContract> getContracts() {
+	public Set<DiscreteHybridContract> getContracts() {
 		return contracts;
 	}
 

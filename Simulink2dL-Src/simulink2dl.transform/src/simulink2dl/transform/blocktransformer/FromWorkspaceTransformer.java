@@ -42,14 +42,14 @@ import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
 import simulink2dl.util.PluginLogger;
 
 public class FromWorkspaceTransformer extends BlockTransformer {
 
-	public FromWorkspaceTransformer(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
+	public FromWorkspaceTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 
@@ -76,10 +76,10 @@ public class FromWorkspaceTransformer extends BlockTransformer {
 		limitFormula.addElement(new Relation(variable, Relation.RelationType.LESS_EQUAL, upperLimit));
 		limitFormula.addElement(new Relation(variable, Relation.RelationType.GREATER_EQUAL, lowerLimit));
 		dlModel.addInitialCondition(limitFormula);
-		dlModel.addBehaviorFront(new TestFormula(limitFormula));
+		dlModel.addDiscreteInput(new TestFormula(limitFormula));
 
 		// add nondeterministic assignment
-		dlModel.addBehaviorFront(new NondeterministicAssignment(variable));
+		dlModel.addTimedOutputBehavior(new NondeterministicAssignment(variable));
 	}
 
 	@Override

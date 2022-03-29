@@ -29,14 +29,14 @@
 package simulink2dl.dlmodel.contracts.hardcoded;
 
 import simulink2dl.dlmodel.contracts.GhostVariable;
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.term.AdditionTerm;
 import simulink2dl.dlmodel.term.RealTerm;
 
-public class TemperatureControlContract extends HybridContract {
+public class TemperatureControlContract extends DiscreteHybridContract {
 
 	public TemperatureControlContract(String serviceName, Constant smallstep) {
 

@@ -28,11 +28,11 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.contracts.hardcoded.RLFactory;
 
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.formula.BooleanConstant;
 
-public class ArrivedCheckerContract extends HybridContract{
+public class ArrivedCheckerContract extends DiscreteHybridContract{
 	/* Arrived checker is transformed to an empty true->true contract */
 	public ArrivedCheckerContract(String serviceName) {
 		

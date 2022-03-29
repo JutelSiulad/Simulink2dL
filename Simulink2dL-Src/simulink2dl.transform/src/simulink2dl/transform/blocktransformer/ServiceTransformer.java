@@ -41,34 +41,11 @@ import org.conqat.lib.simulink.model.SimulinkModel;
 import org.conqat.lib.simulink.model.SimulinkOutPort;
 
 import simulink2dl.dlmodel.DLModel;
-import simulink2dl.dlmodel.contracts.ConcurrentContract;
+import simulink2dl.dlmodel.contracts.ContinuousHybridContract;
 import simulink2dl.dlmodel.contracts.GhostVariable;
 import simulink2dl.dlmodel.contracts.HybridContract;
 import simulink2dl.dlmodel.contracts.RLAgentContract;
-import simulink2dl.dlmodel.contracts.hardcoded.AbstandsrechnerCorrectGainContract;
-import simulink2dl.dlmodel.contracts.hardcoded.CounterContract;
-import simulink2dl.dlmodel.contracts.hardcoded.DiscreteDifferenceContract;
 import simulink2dl.dlmodel.contracts.hardcoded.TemperatureControlContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.ArrivedCheckerContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.AvoidOvershootingContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.CrashDetectorContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.EuclideanDistanceCalculatorContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.EvasiveMoveChooserContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.GoalTrackerContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.InvalidMoveCheckerContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.JobSchedulerContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.MotorControlContractMoveEqVelo;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.MotorControlContractMoveZero;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.NoiseContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.OpponentControllerContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.OpponentEvasionContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.OpponentVelocityContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.RLInfoContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.RLRobotContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.RewardContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.RobotRLAgentContract;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.RobotSensorContractCreator;
-import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.VelocityAdjustorContract1;
 import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
@@ -79,8 +56,7 @@ import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.blocktransformer.BlockTransformer;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.transform.dlmodel.hybridprogram.ServiceAsHybridProgram;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
@@ -96,7 +72,7 @@ public class ServiceTransformer extends BlockTransformer {
 	protected List<Variable> inputVariables;
 	protected List<Variable> outputVariables;
 	
-	public ServiceTransformer(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
+	public ServiceTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 		
 		this.inputVariables = new LinkedList<Variable>();
@@ -169,15 +145,15 @@ public class ServiceTransformer extends BlockTransformer {
 	 * @param contractHP
 	 */
 	private void handleGhosts(HybridContract contract, SimulinkBlock block, HybridProgramCollection contractHP) {
-		if (contract instanceof ConcurrentContract) {
-			for (GhostVariable variable : contract.getGhostVariable()) {
+		if (contract instanceof ContinuousHybridContract) {
+			for (GhostVariable variable : contract.getGhostVariables()) {
 				if(dlModel.getVariableByName(variable.getName())==null) {
 					contractHP.addElement(new DiscreteAssignment(variable, variable.getAssignedTerm()));
 					dlModel.addVariable(variable);
 				}
 			}
 		} else {
-			for (GhostVariable variable : contract.getGhostVariable()) {
+			for (GhostVariable variable : contract.getGhostVariables()) {
 				contractHP.addElement(new DiscreteAssignment(variable, variable.getAssignedTerm()));
 				dlModel.addVariable(variable);
 			}
@@ -275,7 +251,7 @@ public class ServiceTransformer extends BlockTransformer {
 	 * @param contractHP
 	 * @param contractMacros
 	 */
-	private void addToDlModel(DLModelSimulink dlModel, List<HybridContract> contracts, HybridProgramCollection ghostAssignments, HybridProgramCollection outputAssignments, List<Macro> contractMacros) {
+	private void addToDlModel(DLModelFromSimulink dlModel, List<HybridContract> contracts, HybridProgramCollection ghostAssignments, HybridProgramCollection outputAssignments, List<Macro> contractMacros) {
 		// add contract information to the system behavior
 		
 		//TODO: contracts for the same service should all be of the same type.
@@ -285,7 +261,7 @@ public class ServiceTransformer extends BlockTransformer {
 			dlModel.addContracts(contracts);
 			
 			for(HybridContract contract : contracts) {
-				contractHP.addElement(contract.asHybridProgram());
+				contractHP.addElement(contract.asTestFormula());
 			}
 			
 			for(Macro macro : contractMacros) {
@@ -306,7 +282,7 @@ public class ServiceTransformer extends BlockTransformer {
 					discreteBehavior.addBehavior(contractHP);
 				discreteBehavior.addDiscreteContract(dlModel);
 				dlModel.addRLContractsToModel(contracts);
-			} else if (contracts.get(0) instanceof ConcurrentContract){
+			} else if (contracts.get(0) instanceof ContinuousHybridContract) {
 				/* create contract capturing behavior of services that show continuous/concurrent behavior */
 				ConcurrentContractBehavior concurrentContractHP = dlModel.getConcurrentContractBehavior();
 				if(!ghostAssignments.isEmpty())

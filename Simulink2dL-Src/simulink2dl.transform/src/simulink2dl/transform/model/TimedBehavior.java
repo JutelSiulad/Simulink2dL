@@ -28,6 +28,7 @@
  ******************************************************************************/
 package simulink2dl.transform.model;
 
+import simulink2dl.dlmodel.DLModelDefaultStructure;
 import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
@@ -36,11 +37,11 @@ import simulink2dl.dlmodel.hybridprogram.HybridProgramCollection;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.operator.formula.Relation.RelationType;
 import simulink2dl.dlmodel.term.RealTerm;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalChoice;
 import simulink2dl.util.parser.StringParser;
 
-public class DiscreteBehavior {
+public class TimedBehavior {
 
 	private String stepSize;
 	private Constant stepSizeConstant;
@@ -56,7 +57,7 @@ public class DiscreteBehavior {
 	//output must be evaluated first, as values might be needed by following block
 	private ConditionalChoice stepChoice;
 
-	public DiscreteBehavior(String stepSize) {
+	public TimedBehavior(String stepSize) {
 
 		this.stepSize = stepSize;
 		
@@ -114,10 +115,10 @@ public class DiscreteBehavior {
 		onStepOutputBehavior.addElementFront(newBehavior);
 	}
 
-	public void addToModel(DLModelSimulink dlModel) {
-		addStepClock(dlModel);
+	public void addToModel(DLModelFromSimulink modelHandler) {
+		addStepClock(modelHandler);
 		addStepTimeReset();
-		addStepBehavior(dlModel);
+		addStepBehavior(modelHandler);
 	}
 	
 	protected void addStepTimeReset() {
@@ -129,23 +130,23 @@ public class DiscreteBehavior {
 		}
 	}
 	
-	protected void addStepClock(DLModelSimulink dlModel) {
-		dlModel.addVariable(stepClock);
-		dlModel.addContinuousEvolution(stepClock, new RealTerm(1.0));
-		dlModel.addConstant(stepSizeConstant);
+	protected void addStepClock(DLModelFromSimulink modelHandler) {
+		modelHandler.addVariable(stepClock);
+		modelHandler.addContinuousEvolution(stepClock, new RealTerm(1.0));
+		modelHandler.addConstant(stepSizeConstant);
 		
 		if(StringParser.isNumber(stepSize)) {
 			Relation initCondition = new Relation(stepSizeConstant, RelationType.EQUAL, new RealTerm(stepSize));
-			dlModel.addInitialCondition(initCondition);
+			modelHandler.addInitialCondition(initCondition);
 		}
 		Relation initCondition = new Relation(stepClock, RelationType.EQUAL, new RealTerm(0.0));
-		dlModel.addInitialCondition(initCondition);
+		modelHandler.addInitialCondition(initCondition);
 	}
 	
-	protected void addStepBehavior(DLModelSimulink dlModel) {
-		dlModel.addBehaviorFront(stepOutputChoice);
+	protected void addStepBehavior(DLModelFromSimulink modelHandler) {
+		modelHandler.addTimedOutputBehavior(stepOutputChoice);
 		if(!onStepInternalBehavior.isEmpty()) {
-			dlModel.addBehavior(stepChoice);
+			modelHandler.addDiscreteBehavior(stepChoice);
 		}
 	}
 

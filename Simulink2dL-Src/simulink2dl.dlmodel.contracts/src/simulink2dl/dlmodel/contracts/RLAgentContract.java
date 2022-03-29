@@ -32,7 +32,7 @@ package simulink2dl.dlmodel.contracts;
  * Mostly empty, used for distinguishing the RL agent from other contracts
  *
  */
-public class RLAgentContract extends DiscreteContract {
+public class RLAgentContract extends TimedContract {
 	public RLAgentContract(String samplingTime) {
 		super(samplingTime);
 	}

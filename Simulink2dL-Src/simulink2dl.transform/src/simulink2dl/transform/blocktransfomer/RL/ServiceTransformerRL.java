@@ -36,6 +36,7 @@ import java.util.List;
 import org.conqat.lib.simulink.model.SimulinkModel;
 
 import simulink2dl.dlmodel.DLModel;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.contracts.HybridContract;
 import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.ArrivedCheckerContract;
 import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.AvoidOvershootingContract;
@@ -64,7 +65,7 @@ import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLWaterDistAgen
 import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLWaterDistInfoContract;
 import simulink2dl.transform.Environment;
 import simulink2dl.transform.blocktransformer.ServiceTransformer;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.util.PluginLogger;
 /** Service transformer for the SimulinkRL2dL project.
  * TODO: Rework contract implementation.
@@ -73,7 +74,7 @@ import simulink2dl.util.PluginLogger;
 */
 public class ServiceTransformerRL extends ServiceTransformer {
 	
-	public ServiceTransformerRL(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
+	public ServiceTransformerRL(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 	@Override

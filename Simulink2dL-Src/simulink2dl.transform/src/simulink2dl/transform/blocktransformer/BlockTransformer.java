@@ -46,17 +46,17 @@ import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
 import simulink2dl.transform.macro.SizePropagationMacro;
-import simulink2dl.transform.model.DiscreteBehavior;
+import simulink2dl.transform.model.TimedBehavior;
 import simulink2dl.util.PluginLogger;
 
 public abstract class BlockTransformer {
 
 	protected SimulinkModel simulinkModel;
-	protected DLModelSimulink dlModel;
+	protected DLModelFromSimulink dlModel;
 
 	protected boolean handleControlFlow;
 
@@ -70,7 +70,7 @@ public abstract class BlockTransformer {
 
 	public abstract List<Macro> createMacro(SimulinkBlock block);
 
-	public BlockTransformer(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
+	public BlockTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
 		this.simulinkModel = simulinkModel;
 		this.dlModel = dlModel;
 		this.environment = environment;
@@ -85,7 +85,7 @@ public abstract class BlockTransformer {
 
 		// get discrete behavior element with sample time of this block
 		String sampleTime = getBlockSampleTime(block);
-		DiscreteBehavior discreteBehavior = dlModel.getDiscreteBehavior(sampleTime);
+		TimedBehavior discreteBehavior = dlModel.getDiscreteBehavior(sampleTime);
 
 		// add variable
 		Variable delayOut = new Variable("R", block.getName() + "Out");

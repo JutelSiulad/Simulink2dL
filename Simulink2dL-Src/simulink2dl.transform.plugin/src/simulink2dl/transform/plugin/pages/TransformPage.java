@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.transform.Transformer;
 import simulink2dl.transform.optimizer.ConditionalChoiceOptimizer;
 import simulink2dl.transform.optimizer.ContradictionOptimizer;
@@ -451,14 +451,14 @@ public class TransformPage extends WizardPage {
 
 	}
 
-	private Set<HybridContract> lookupContractsInFolders(List<File> contractFiles) {
+	private Set<DiscreteHybridContract> lookupContractsInFolders(List<File> contractFiles) {
 		// TODO
 		// existence of given folders is already ensured
 		// folders are given as absolute paths
 		PluginLogger.debug("method 'lookupContractsInFolders' in class 'TransformPage' is not yet implemented");
 		PluginLogger.debug("method 'lookupContractsInFolders' in class 'TransformPage' is not yet implemented");
 
-		return new HashSet<HybridContract>();
+		return new HashSet<DiscreteHybridContract>();
 	}
 
 	private void putAvailableHandlersInTable(Table tbl, String prefix) {

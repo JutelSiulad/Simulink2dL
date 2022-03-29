@@ -43,14 +43,14 @@ import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
 import simulink2dl.util.PluginLogger;
 
 public class InportTransformer extends BlockTransformer {
 
-	public InportTransformer(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
+	public InportTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 	/**
@@ -76,7 +76,7 @@ public class InportTransformer extends BlockTransformer {
 		// add discretized input and assign input value to discretized value
 		Variable discretizedVariable = new Variable("R", blockName+"Discrete");
 		Variable variable = new Variable("R", blockName);
-		dlModel.addToDiscreteInput(new DiscreteAssignment(discretizedVariable, variable));
+		dlModel.addDiscreteInput(new DiscreteAssignment(discretizedVariable, variable));
 		dlModel.addVariable(discretizedVariable);
 		dlModel.addVariable(variable);
 

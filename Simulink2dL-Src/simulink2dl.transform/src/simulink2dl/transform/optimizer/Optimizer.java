@@ -48,14 +48,14 @@ import simulink2dl.dlmodel.operator.formula.Formula;
 import simulink2dl.dlmodel.operator.formula.Negation;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.operator.formula.StringFormula;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalChoice;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalHybridProgram;
 import simulink2dl.util.PluginLogger;
 
 public abstract class Optimizer {
 
-	public void run(DLModelSimulink dLModel) {
+	public void run(DLModelFromSimulink dLModel) {
 		iterateCollection(dLModel.getBehavior());
 	}
 

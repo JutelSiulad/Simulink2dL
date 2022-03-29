@@ -28,11 +28,11 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.contracts.hardcoded.RLFactory;
 
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.elements.Variable;
 
 
-public class CrashDetectorContract extends HybridContract {
+public class CrashDetectorContract extends DiscreteHybridContract {
 	/* Crash detector is transformed to an empty true->true contract */
 	public CrashDetectorContract(String serviceName) {
 		

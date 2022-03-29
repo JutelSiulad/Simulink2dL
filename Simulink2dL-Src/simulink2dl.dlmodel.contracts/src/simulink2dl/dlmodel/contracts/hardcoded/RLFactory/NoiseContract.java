@@ -28,14 +28,14 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.contracts.hardcoded.RLFactory;
 
-import simulink2dl.dlmodel.contracts.HybridContract;
+import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Relation;
 
 
-public class NoiseContract extends HybridContract{
+public class NoiseContract extends DiscreteHybridContract{
 	/* Contract of the noise service used for the noise experiment */
 	public NoiseContract(String serviceName) {
 		serviceName = serviceName.replace("RLService", "");

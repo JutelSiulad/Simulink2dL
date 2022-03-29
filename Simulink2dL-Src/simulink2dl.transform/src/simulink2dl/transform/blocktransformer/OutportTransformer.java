@@ -41,14 +41,14 @@ import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.operator.formula.Relation.RelationType;
 import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelSimulink;
+import simulink2dl.transform.dlmodel.DLModelFromSimulink;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SizePropagationMacro;
 import simulink2dl.util.PluginLogger;
 
 public class OutportTransformer extends BlockTransformer {
 
-	public OutportTransformer(SimulinkModel simulinkModel, DLModelSimulink dlModel, Environment environment) {
+	public OutportTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 

@@ -31,6 +31,7 @@ package simulink2dl.transform.dlmodel;
 import java.util.LinkedList;
 import java.util.List;
 
+import simulink2dl.dlmodel.DLModel;
 import simulink2dl.dlmodel.DLModelDefaultStructure;
 import simulink2dl.dlmodel.contracts.HybridContract;
 import simulink2dl.dlmodel.elements.Constant;
@@ -38,9 +39,7 @@ import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
 import simulink2dl.dlmodel.hybridprogram.HybridProgram;
 import simulink2dl.dlmodel.hybridprogram.HybridProgramCollection;
-import simulink2dl.dlmodel.hybridprogram.NondeterministicAssignment;
 import simulink2dl.dlmodel.hybridprogram.DifferentialEquation;
-import simulink2dl.dlmodel.hybridprogram.TestFormula;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Formula;
 import simulink2dl.dlmodel.operator.formula.Relation;
@@ -49,38 +48,33 @@ import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.dlmodel.term.VectorTerm;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.macro.ConditionalMacro;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SizePropagationMacro;
 import simulink2dl.transform.model.ConcurrentContractBehavior;
 import simulink2dl.transform.model.ContinuousEvolutionBehavior;
-import simulink2dl.transform.model.DiscreteBehavior;
+import simulink2dl.transform.model.TimedBehavior;
 import simulink2dl.transform.model.DiscreteContractBehavior;
 import simulink2dl.transform.model.container.ContinuousEvolutionContainer;
 import simulink2dl.util.PluginLogger;
 
-public class DLModelSimulink extends DLModelDefaultStructure {
+public class DLModelFromSimulink extends DLModelDefaultStructure {
 
+	protected Conjunction initialConditions;
 	private List<Macro> macros;
-	
 	private List<HybridContract> rLContracts;
+	private List<TimedBehavior> timedBehaviors;
+	private ConcurrentContractBehavior concurrentContracts;
+	private HybridProgramCollection unsortedOutpus;
 	
-	private List<DiscreteBehavior> discreteBehaviors;
-	
+	private HybridProgramCollection smallStepAndEpsilonAssignment;
 	private HybridProgramCollection discreteInputBehavior;
-	
+	private HybridProgramCollection timedOutputBehavior;
+	private HybridProgramCollection discreteBehavior;
 	private HybridProgramCollection discreteOutputBehavior;
-
 	private ContinuousEvolutionBehavior continuousBehavior;
-	
 	private HybridProgramCollection continousOutputBehavior;
-	
 	private HybridProgramCollection continuousInputBehavior;
 	
-	private ConcurrentContractBehavior concurrentContracts;
-	
-	private HybridProgramCollection unsortedOutpus;
-
 	@Deprecated
 	protected HybridProgramCollection contractBehavior;
 
@@ -88,35 +82,47 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 
 	private Variable simClock;
 
-	public DLModelSimulink() {
-		super();
+	public DLModelFromSimulink() {
+		rLContracts = new LinkedList<HybridContract>();
+		macros = new LinkedList<Macro>();
+		contracts = new LinkedList<HybridContract>();
+		timedBehaviors = new LinkedList<TimedBehavior>();
 		
-		this.rLContracts = new LinkedList<HybridContract>();
+		unsortedOutpus = new HybridProgramCollection();
 		
-		this.macros = new LinkedList<Macro>();
-
-		this.unsortedOutpus = new HybridProgramCollection();
-		this.discreteBehaviors = new LinkedList<DiscreteBehavior>();
-		this.discreteInputBehavior = new HybridProgramCollection();
-		this.discreteOutputBehavior = new HybridProgramCollection();
-		this.continuousBehavior = new ContinuousEvolutionBehavior();
-		this.continousOutputBehavior = new HybridProgramCollection();
-		this.continuousInputBehavior = new HybridProgramCollection();
-		this.contractBehavior = new HybridProgramCollection();
-
-		this.contracts = new LinkedList<HybridContract>();
+		initialConditions=new Conjunction();
 		
-		// create simulation time variable
-		Relation initCondition;
-
-		// Variables
-		simClock = new Variable("R", "simTime");
-		initCondition = new Relation(simClock, RelationType.EQUAL, new RealTerm(0.0));
-		addVariable(simClock);
-		addInitialCondition(initCondition);
-		this.continuousBehavior.addNewSingleEvolution(new DifferentialEquation(simClock, new RealTerm(1.0)));
+		smallStepAndEpsilonAssignment = new HybridProgramCollection();
+		discreteInputBehavior = new HybridProgramCollection();
+		timedOutputBehavior = new HybridProgramCollection();
+		discreteBehavior = new HybridProgramCollection();
+		discreteOutputBehavior = new HybridProgramCollection();
+		continuousBehavior = new ContinuousEvolutionBehavior();
+		continousOutputBehavior = new HybridProgramCollection();
+		continuousInputBehavior = new HybridProgramCollection();
 	}
 
+	public void addInitialCondition(Relation initCondition) {
+		initialConditions.addElement(initCondition);
+		
+	}
+	
+	public void addToSmallstepReset(HybridProgram hp) {
+		smallStepAndEpsilonAssignment.addElement(hp);
+	}
+
+	public void addSimClock(DLModelDefaultStructure model) {
+		simClock = new Variable("R", "simTime");
+		addInitialCondition(new Relation(simClock, RelationType.EQUAL, new RealTerm(0.0)));
+		addVariable(simClock);
+		continuousBehavior.addNewSingleEvolution(new DifferentialEquation(simClock, new RealTerm(1.0)));
+	}
+	
+	public void addDiscreteBehavior(HybridProgram hp) {
+		discreteBehavior.addElement(hp);
+	}
+	
+	
 	public void addOutput(HybridProgram output) {
 		unsortedOutpus.addElement(output);
 	}
@@ -130,9 +136,12 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 	}
 	
 	public void addMacro(Macro newMacro) {
-		this.macros.add(newMacro);
+		macros.add(newMacro);
 	}
 	
+	public void addTimedOutputBehavior(HybridProgram stepOutputChoice) {
+		timedOutputBehavior.addElement(stepOutputChoice);
+	}
 	/**
 	 * Replaces vector-variables with one variable for each entry
 	 */
@@ -152,40 +161,40 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 	
 	public void finalizeModel(Environment environment) {
 		finalizeMacros();
-
-		this.addBehavior(discreteInputBehavior);
 		
-		// handle all discrete behavior
-		for (DiscreteBehavior discreteBehavior : discreteBehaviors) {
-			discreteBehavior.addToModel(this);
+		for (TimedBehavior timedBehavior : timedBehaviors) {
+			timedBehavior.addToModel(this);
 		}
-		if(concurrentContracts!=null) {
-			concurrentContracts.addToModel(this);
-		}
-
-		// apply macros to the model
-		this.applyMacros();
-		
-		this.handleOutputs();
-		
-		// add outputs NOT influenced by continous behavior
-		this.addBehaviorFront(discreteOutputBehavior);
-		
-		// add continuous behavior
-		this.addBehavior(this.continuousBehavior.asHybridProgram());
-		
-		// add outputs influenced by continous behavior
-		this.addBehavior(continousOutputBehavior);
-		
-		this.addBehavior(continuousInputBehavior);
-
-		// expand HPs with Vectorterms
-		this.expandVectors();
-		
+		// apply macros to all parts of the model
+		applyMacros();
+		handleOutputs();
+		expandVectors();
 		environment.finalizeEnvironment();
+		
+		if(concurrentContracts!=null) {
+			//concurrentContracts.addToModelHandler(this);
+		}
+		
+		// add everything to the model
+		if(!smallStepAndEpsilonAssignment.isEmpty())
+		this.addBehavior(smallStepAndEpsilonAssignment);
+		if(!discreteInputBehavior.isEmpty())
+		this.addBehavior(discreteInputBehavior);
+		if(!timedOutputBehavior.isEmpty())
+		this.addBehavior(timedOutputBehavior);
+		if(!discreteBehavior.isEmpty())
+		this.addBehavior(discreteBehavior);
+		if(!discreteOutputBehavior.isEmpty())
+		this.addBehavior(discreteOutputBehavior);
+		this.addBehavior(continuousBehavior.asHybridProgram());
+		if(!continousOutputBehavior.isEmpty())
+		this.addBehavior(continousOutputBehavior);
+		if(!continuousInputBehavior.isEmpty())
+		this.addBehavior(continuousInputBehavior);
+		
 
 		// add discrete steps to continuous evolution domains
-		for (DiscreteBehavior discreteBehavior : discreteBehaviors) {
+		for (TimedBehavior discreteBehavior : timedBehaviors) {
 			Variable clock = discreteBehavior.getClockVariable();
 			Constant stepsize = discreteBehavior.getStepSizeConstant();
 
@@ -199,7 +208,10 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 		List<HybridProgram> outputAssignments = unsortedOutpus.getInnerPrograms(new LinkedList<HybridProgram>());
 		
 		LinkedList<Variable> discBoundVars = new LinkedList<Variable>();
-		behavior.getBoundVariables(discBoundVars);
+		for (TimedBehavior discreteBehavior : timedBehaviors) {
+			discreteBehavior.addToModel(this);
+		}
+		discreteBehavior.getBoundVariables(discBoundVars);
 		LinkedList<Variable> contBoundVars = new LinkedList<Variable>();
 		continuousBehavior.getBoundVariables(contBoundVars);
 		
@@ -237,16 +249,18 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 			// handle initial conditions
 			macro.applyToInitialConditions(initialConditions);
 			
-			// handle discrete behavior
-			macro.applyToHybridProgramCollection(behavior);
-
-			// handle continuous behavior
-			macro.applyToContinuousBehavior(continuousBehavior);
-
-			// apply to outputs
+			// apply to unsorted outputs
 			macro.applyToHybridProgramCollection(unsortedOutpus);
-			macro.applyToHybridProgramCollection(continousOutputBehavior);
+			
+			// apply to all parts of the program
+			macro.applyToHybridProgramCollection(smallStepAndEpsilonAssignment);
+			macro.applyToHybridProgramCollection(discreteInputBehavior);
+			macro.applyToHybridProgramCollection(timedOutputBehavior);
+			macro.applyToHybridProgramCollection(discreteBehavior);
 			macro.applyToHybridProgramCollection(discreteOutputBehavior);
+			macro.applyToContinuousBehavior(continuousBehavior);
+			macro.applyToHybridProgramCollection(continousOutputBehavior);
+			macro.applyToHybridProgramCollection(continuousInputBehavior);
 		}
 	}
 	
@@ -254,7 +268,7 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 	 * Expand HPs with VectorTerms
 	 */
 	private void expandVectors() {
-		behavior = (HybridProgramCollection) behavior.expand();
+		discreteBehavior = (HybridProgramCollection) discreteBehavior.expand();
 		continuousBehavior = continuousBehavior.expand();
 		initialConditions = (Conjunction) initialConditions.expand();
 		expandVariables();
@@ -352,13 +366,6 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 		}
 	}
 
-	@Override
-	public String createOutputString(boolean multiLineTestFormulas, boolean multiLineEvolutionDomains) {
-		String result = super.createOutputString(multiLineTestFormulas, multiLineEvolutionDomains);
-
-		return result;
-	}
-
 	public void addContractBehavior(HybridProgram newContractBehavior) {
 		contractBehavior.addElement(newContractBehavior);
 	}
@@ -375,17 +382,17 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 	 * @param stepSize
 	 * @return
 	 */
-	public DiscreteBehavior getDiscreteBehavior(String stepSize) {
+	public TimedBehavior getDiscreteBehavior(String stepSize) {
 		// search existing behavior blocks for given stepSize
-		for (DiscreteBehavior existingBehavior : discreteBehaviors) {
+		for (TimedBehavior existingBehavior : timedBehaviors) {
 			if (!(existingBehavior instanceof DiscreteContractBehavior) & existingBehavior.isStepTime(stepSize)) {
 				return existingBehavior;
 			}
 		}
 
 		// create new block
-		DiscreteBehavior newBehavior = new DiscreteBehavior(stepSize);
-		discreteBehaviors.add(newBehavior);
+		TimedBehavior newBehavior = new TimedBehavior(stepSize);
+		timedBehaviors.add(newBehavior);
 		return newBehavior;
 	}
 	
@@ -414,8 +421,8 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 	 * @param variable
 	 * @param evolutionTerm
 	 */
-	public void addDiscreteBehavior(DiscreteBehavior behavior) {
-		discreteBehaviors.add(behavior);
+	public void addTimedBehavior(TimedBehavior behavior) {
+		timedBehaviors.add(behavior);
 	}
 
 	/**
@@ -436,13 +443,12 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 	public void addAlternativeToAllEvolutionDomains(Formula evolutionDomain) {
 		continuousBehavior.addAlternativeToAllEvolutionDomains(evolutionDomain);
 	}
-
 	public void addConjunctionToAllEvolutionDomains(Formula evolutionDomain) {
 		continuousBehavior.addConjunctionToAllEvolutionDomains(evolutionDomain);
 	}
 	
 	public void addContracts(List<HybridContract> contracts2) {
-		this.contracts.addAll(contracts2);
+		contracts.addAll(contracts2);
 	}
 
 	public void addRLContractsToModel(List<HybridContract> contracts){
@@ -457,7 +463,7 @@ public class DLModelSimulink extends DLModelDefaultStructure {
 		return rLContracts;
 	}
 
-	public void addToDiscreteInput(HybridProgram inputProgram) {
+	public void addDiscreteInput(HybridProgram inputProgram) {
 		discreteInputBehavior.addElement(inputProgram);
 	}
 
