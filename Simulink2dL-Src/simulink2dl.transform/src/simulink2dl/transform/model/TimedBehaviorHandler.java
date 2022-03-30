@@ -28,7 +28,6 @@
  ******************************************************************************/
 package simulink2dl.transform.model;
 
-import simulink2dl.dlmodel.DLModelDefaultStructure;
 import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
@@ -124,9 +123,9 @@ public class TimedBehaviorHandler {
 	protected void addStepTimeReset() {
 		DiscreteAssignment reset = new DiscreteAssignment(stepClock, new RealTerm(0.0));
 		if(!onStepInternalBehavior.isEmpty()) {
-			onStepInternalBehavior.addElementFront(reset);
+			onStepInternalBehavior.addElement(reset);
 		} else {
-			onStepOutputBehavior.addElementFront(reset);
+			onStepOutputBehavior.addElement(reset);
 		}
 	}
 	

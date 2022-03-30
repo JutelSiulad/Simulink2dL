@@ -63,6 +63,10 @@ public class ConditionalHybridProgram implements HybridProgram {
 	public HybridProgram getInnerProgram() {
 		return choice;
 	}
+	
+	public void setInnerProgram(HybridProgram newHP) {
+		choice = newHP;
+	}
 
 	@Override
 	public String toString() {

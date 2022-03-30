@@ -29,6 +29,7 @@
 package simulink2dl.transform.optimizer;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import simulink2dl.dlmodel.hybridprogram.ContinuousEvolution;
 import simulink2dl.dlmodel.hybridprogram.DebugString;
@@ -45,6 +46,7 @@ import simulink2dl.dlmodel.operator.formula.BooleanConstant;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Disjunction;
 import simulink2dl.dlmodel.operator.formula.Formula;
+import simulink2dl.dlmodel.operator.formula.Implication;
 import simulink2dl.dlmodel.operator.formula.Negation;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.operator.formula.StringFormula;
@@ -56,13 +58,7 @@ import simulink2dl.util.PluginLogger;
 public abstract class Optimizer {
 
 	public void run(TransformedDLModel dLModel) {
-		iterateCollection(dLModel.getBehavior());
-	}
-
-	private void iterateCollection(HybridProgramCollection hpCollection) {
-		for (HybridProgram program : hpCollection.getInnerPrograms(new LinkedList<HybridProgram>())) {
-			handleSingleProgram(program);
-		}
+		handleSingleProgram(dLModel.getHybridProgram());
 	}
 
 	private void handleSingleProgram(HybridProgram program) {
@@ -84,8 +80,6 @@ public abstract class Optimizer {
 		} else if (program instanceof HybridProgramCollection) {
 			// handle program
 			handleCollection((HybridProgramCollection) program);
-			// recursive call for inner programs
-			iterateCollection((HybridProgramCollection) program);
 		} else if (program instanceof IfStatement) {
 			IfStatement ifStatement = (IfStatement) program;
 			// handle formula
@@ -203,7 +197,96 @@ public abstract class Optimizer {
 	}
 
 	protected void handleCollection(HybridProgramCollection hpCollection) {
-		// do nothing
+
+		removeTrivialTests(hpCollection);
+		
+		trimCollection(hpCollection);
+		
+		mergeConditionalHybridPrograms(hpCollection);
+		//recursive call for inner programs
+		for (HybridProgram program : hpCollection.getInnerPrograms(new LinkedList<HybridProgram>())) {
+			handleSingleProgram(program);
+		}
+		
+		
+	}
+	
+	protected void trimCollection(HybridProgramCollection hpCollection) {
+		List<HybridProgram> collectionSequence = hpCollection.getSequence();
+		
+		for(int i = 0; i<collectionSequence.size(); i++) {
+			if(collectionSequence.get(i) instanceof HybridProgramCollection) {
+				List<HybridProgram> nestedSequence = ((HybridProgramCollection)collectionSequence.get(i)).getSequence();
+				if(nestedSequence.size()==1) {
+					collectionSequence.set(i, nestedSequence.get(0));
+				}
+			}
+		}
+		
+		for(int i = 0; i<collectionSequence.size(); i++) {
+			HybridProgram hp = collectionSequence.get(i);
+			if(hp instanceof HybridProgramCollection) {
+				HybridProgramCollection innerProgram = (HybridProgramCollection) hp;
+				if(innerProgram.isEmpty()) {
+					collectionSequence.remove(i);
+					i--;
+				}
+			}
+		}
+	}
+	
+	//TODO
+	protected void removeTrivialTests(HybridProgramCollection hpCollection) {
+		List<HybridProgram> hps = hpCollection.getSequence();
+		for(int i = 0; i<hps.size();i++) {
+			HybridProgram hp = hps.get(i);
+			if(hp instanceof TestFormula) {
+				Formula test = ((TestFormula)hp).getFormula();
+				if(test.equals(new BooleanConstant(true)) || test.equals(new Implication(new BooleanConstant(true),new BooleanConstant(true)))) {
+					hps.remove(i);
+					i--;
+				}
+			}
+		}
+	}
+	
+	// merges successive conditional choice programs if tests are equal TODO: check if bound variables are influenced
+	protected void mergeConditionalHybridPrograms(HybridProgramCollection hpCollection) {
+		List<HybridProgram> hps = hpCollection.getSequence();
+		for(int i = 0; i<hps.size()-1;i++) {
+			HybridProgram currentHP = hps.get(i);
+			HybridProgram nextHP = hps.get(i+1);
+			if(currentHP instanceof ConditionalChoice && nextHP instanceof ConditionalChoice) {
+				ConditionalChoice currentConditionalChoice = (ConditionalChoice) currentHP;
+				ConditionalChoice nextConditionalChoice = (ConditionalChoice) nextHP;
+				List<ConditionalHybridProgram> currentChoices = currentConditionalChoice.getChoices();
+				List<ConditionalHybridProgram> nextChoices = nextConditionalChoice.getChoices();
+				boolean equal = true;
+				if(!(currentChoices.size()==nextChoices.size())) {
+					equal = false;
+				} else {
+					for(int j = 0; j<currentChoices.size(); j++) {
+						ConditionalHybridProgram currentChoice = currentChoices.get(j);
+						ConditionalHybridProgram nextChoice = nextChoices.get(j);
+						if(!currentChoice.getCondition().equals(nextChoice.getCondition())) {
+							equal = false;
+						}
+					}
+				}
+				if(equal) {
+					for(int j = 0; j<currentChoices.size(); j++) {
+						ConditionalHybridProgram currentChoice = currentChoices.get(j);
+						ConditionalHybridProgram nextChoice = nextChoices.get(j);
+						HybridProgramCollection newHP = new HybridProgramCollection();
+						newHP.addElement(currentChoice.getInnerProgram());
+						newHP.addElement(nextChoice.getInnerProgram());
+						currentChoice.setInnerProgram(newHP);
+					}
+					hps.remove(i+1);
+					i--;
+				}
+			}
+		}
 	}
 
 	protected void handleIfStatement(IfStatement ifStatement) {

@@ -201,16 +201,15 @@ public class TransformedDLModel extends DLModelDefaultStructure {
 		continousBehavior.addElement(continuousEvolutionHandler.asHybridProgram());
 
 		// add discrete steps to continuous evolution domains
-		for (TimedBehaviorHandler discreteBehavior : timedBehaviorHandlers) {
-			Variable clock = discreteBehavior.getClockVariable();
-			Constant stepsize = discreteBehavior.getStepSizeConstant();
+		for (TimedBehaviorHandler timedBehavior : timedBehaviorHandlers) {
+			Variable clock = timedBehavior.getClockVariable();
+			Constant stepsize = timedBehavior.getStepSizeConstant();
 
 			Formula stepCondition = new Relation(clock, Relation.RelationType.LESS_EQUAL, stepsize);
 
 			addConjunctionToAllEvolutionDomains(stepCondition);
 		}
 		
-		trimHybridProgramBehavior();
 	}
 	
 	private void handleUnsortedOutputs() {
@@ -434,17 +433,6 @@ public class TransformedDLModel extends DLModelDefaultStructure {
 	 */
 	public void addNewEvolutionAlternatives(List<ContinuousEvolutionContainer> toAddEvolutionsAlternatives) {
 		continuousEvolutionHandler.addNewEvolutionAlternatives(toAddEvolutionsAlternatives);
-	}
-	
-	private void trimHybridProgramBehavior() {
-		List<HybridProgram> hps = hybridProgram.getSequence();
-		for(int i = 0; i<hps.size(); i++) {
-			HybridProgram hp = hps.get(i);
-			if(hp instanceof HybridProgramCollection && ((HybridProgramCollection) hp).isEmpty()) {
-				hps.remove(i);
-				i--;
-			}
-		}
 	}
 
 	public Variable getSimulationClockVariable() {
