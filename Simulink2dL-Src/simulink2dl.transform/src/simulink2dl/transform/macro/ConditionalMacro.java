@@ -43,7 +43,7 @@ import simulink2dl.dlmodel.operator.formula.Relation.RelationType;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalChoice;
-import simulink2dl.transform.model.ContinuousEvolutionBehavior;
+import simulink2dl.transform.model.ContinuousEvolutionHandler;
 import simulink2dl.util.PluginLogger;
 import simulink2dl.util.satisfiability.FormulaChecker;
 import simulink2dl.util.satisfiability.FormulaChecker.ResultType;
@@ -218,7 +218,7 @@ public class ConditionalMacro extends Macro {
 	}
 
 	@Override
-	public void applyToContinuousBehavior(ContinuousEvolutionBehavior continuousBehavior) {
+	public void applyToContinuousBehavior(ContinuousEvolutionHandler continuousBehavior) {
 		continuousBehavior.applyConditionalMacro(this);
 	}
 

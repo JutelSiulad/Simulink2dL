@@ -47,7 +47,7 @@ import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelFromSimulink;
+import simulink2dl.transform.dlmodel.TransformedDLModel;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalChoice;
 import simulink2dl.transform.macro.ConditionalMacro;
 import simulink2dl.transform.macro.Macro;
@@ -57,7 +57,7 @@ import simulink2dl.util.parser.StringToTerm;
 
 public class RelayTransformer extends BlockTransformer {
 
-	public RelayTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
+	public RelayTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 
@@ -113,7 +113,7 @@ public class RelayTransformer extends BlockTransformer {
 		choice.addChoice(testOnTrue, caseOn);
 		choice.addChoice(testOffTrue, caseOff);
 		choice.addChoice(new Conjunction(testOnFalse, testOffFalse), caseHold);
-		dlModel.addBehavior(choice);
+		dlModel.addToHybridProgram(choice);
 		
 		//add initial conditions:
 		Relation initialOnValue = new Relation(variable,  RelationType.EQUAL, new RealTerm(outputOn));

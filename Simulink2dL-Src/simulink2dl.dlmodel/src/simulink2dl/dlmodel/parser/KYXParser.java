@@ -144,7 +144,7 @@ public class KYXParser {
 			// Formula postConditionFormula = this.formulaParser.parse(postCondition);
 			// TODO is postCondition ever used?
 			NondeterministicRepetition loop = parseNondeterministicRepetition(programInsideBox);
-			this.defStruct.addBehavior(loop.getInnerProgram());
+			this.defStruct.addToHybridProgram(loop.getInnerProgram());
 			this.defStruct.getLoop().setInvariant(loop.getInvariant());
 		} else { // DLModel
 			// TODO

@@ -36,7 +36,7 @@ import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.macro.BusCreatorMacro.BusSignal;
-import simulink2dl.transform.model.ContinuousEvolutionBehavior;
+import simulink2dl.transform.model.ContinuousEvolutionHandler;
 import simulink2dl.util.PluginLogger;
 
 public class BusSelectorMacro extends Macro {
@@ -129,7 +129,7 @@ public class BusSelectorMacro extends Macro {
 	}
 
 	@Override
-	public void applyToContinuousBehavior(ContinuousEvolutionBehavior continuousBehavior) {
+	public void applyToContinuousBehavior(ContinuousEvolutionHandler continuousBehavior) {
 		// do nothing
 	}
 

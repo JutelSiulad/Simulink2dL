@@ -86,7 +86,7 @@ public class TestFormula implements HybridProgram {
 
 	@Override
 	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
-		return new LinkedList<HybridProgram>();
+		return hps;
 	}
 
 	@Override

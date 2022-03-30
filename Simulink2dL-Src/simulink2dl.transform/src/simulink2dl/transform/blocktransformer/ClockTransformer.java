@@ -37,13 +37,13 @@ import org.conqat.lib.simulink.model.SimulinkModel;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelFromSimulink;
+import simulink2dl.transform.dlmodel.TransformedDLModel;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
 
 public class ClockTransformer extends BlockTransformer {
 
-	public ClockTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
+	public ClockTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 

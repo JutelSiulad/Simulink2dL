@@ -38,14 +38,14 @@ import org.conqat.lib.simulink.model.SimulinkOutPort;
 import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelFromSimulink;
+import simulink2dl.transform.dlmodel.TransformedDLModel;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.VectorMacro;
 import simulink2dl.util.PluginLogger;
 
 public class MuxTransformer extends BlockTransformer {
 
-	public MuxTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
+	public MuxTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 

@@ -48,7 +48,7 @@ import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.contracts.HybridContract;
 import simulink2dl.transform.blocktransformer.BlockTransformer;
 import simulink2dl.transform.blocktransformer.TransformerFactory;
-import simulink2dl.transform.dlmodel.DLModelFromSimulink;
+import simulink2dl.transform.dlmodel.TransformedDLModel;
 import simulink2dl.transform.optimizer.ConditionalChoiceOptimizer;
 import simulink2dl.transform.optimizer.ContradictionOptimizer;
 import simulink2dl.transform.optimizer.EvolutionDomainOptimizer;
@@ -67,7 +67,7 @@ public class Transformer {
 
 	private SimulinkModel simulinkModel;
 
-	private DLModelFromSimulink modelHandler;
+	private TransformedDLModel modelHandler;
 
 	private Environment environment;
 
@@ -77,7 +77,7 @@ public class Transformer {
 
 	public Transformer(SimulinkModel model, Set<DiscreteHybridContract> contracts) {
 		this.simulinkModel = model;
-		this.modelHandler = new DLModelFromSimulink();
+		this.modelHandler = new TransformedDLModel();
 
 		this.environment = new Environment(modelHandler, model, contracts);
 
@@ -98,7 +98,7 @@ public class Transformer {
 		return this.simulinkModel;
 	}
 
-	public DLModelFromSimulink getDLModel() {
+	public TransformedDLModel getDLModel() {
 		return this.modelHandler;
 	}
 

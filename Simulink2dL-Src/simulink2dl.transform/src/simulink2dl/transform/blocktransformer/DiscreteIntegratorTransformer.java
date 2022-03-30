@@ -46,16 +46,16 @@ import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelFromSimulink;
+import simulink2dl.transform.dlmodel.TransformedDLModel;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
-import simulink2dl.transform.model.TimedBehavior;
+import simulink2dl.transform.model.TimedBehaviorHandler;
 import simulink2dl.util.PluginLogger;
 import simulink2dl.util.parser.StringParser;
 
 public class DiscreteIntegratorTransformer extends BlockTransformer {
 
-	public DiscreteIntegratorTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel,
+	public DiscreteIntegratorTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel,
 			Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
@@ -75,7 +75,7 @@ public class DiscreteIntegratorTransformer extends BlockTransformer {
 
 		// get discrete behavior element with sample time of this block
 		String sampleTimeString = getBlockSampleTime(block);
-		TimedBehavior discreteBehavior = dlModel.getDiscreteBehavior(sampleTimeString);
+		TimedBehaviorHandler discreteBehavior = dlModel.getDiscreteBehavior(sampleTimeString);
 		double sampleTime = StringParser.parseScalar(sampleTimeString);
 
 		// add variables

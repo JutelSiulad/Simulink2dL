@@ -137,7 +137,7 @@ public class DiscreteAssignment implements HybridProgram {
 
 	@Override
 	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
-		return new LinkedList<HybridProgram>();
+		return hps;
 	}
 
 	@Override

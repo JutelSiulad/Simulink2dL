@@ -140,7 +140,7 @@ public class RobotRLAgentContract extends RLAgentContract{
 		Term distance = new ExponentTerm((new AdditionTerm(new ExponentTerm(DiffX,new RealTerm(2)),new ExponentTerm(DiffY,new RealTerm(2)))), new RealTerm(0.5));
 		
 		AdditionTerm newDistance = new AdditionTerm(distance);
-		Constant samplingTime = new Constant("R", "STEP"+this.getSamplingTime());
+		Constant samplingTime = new Constant("R", "STEP"+this.getSampleTime());
 		constants.add(samplingTime);
 		newDistance.subtract(new MultiplicationTerm(Velocity, samplingTime));
 		newDistance.subtract(new MultiplicationTerm(VelocityOpp, samplingTime));

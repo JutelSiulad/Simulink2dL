@@ -178,13 +178,13 @@ public class ConditionalChoice implements HybridProgram {
 
 	@Override
 	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
-		return new LinkedList<HybridProgram>(choices);
+		hps.addAll(choices);
+		return hps;
 	}
 
 	@Override
 	public List<Term> getInnerTerms(List<Term> terms) {
-		// TODO Auto-generated method stub
-		return null;
+		return terms;
 	}
 
 }

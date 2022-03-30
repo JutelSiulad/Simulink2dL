@@ -38,14 +38,14 @@ import org.conqat.lib.simulink.model.SimulinkOutPort;
 import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelFromSimulink;
+import simulink2dl.transform.dlmodel.TransformedDLModel;
 import simulink2dl.transform.macro.BusCreatorMacro;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.util.PluginLogger;
 
 public class BusCreatorTransformer extends BlockTransformer {
 
-	public BusCreatorTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
+	public BusCreatorTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 

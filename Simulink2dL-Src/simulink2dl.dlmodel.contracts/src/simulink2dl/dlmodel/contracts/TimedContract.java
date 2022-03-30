@@ -40,7 +40,7 @@ public class TimedContract extends DiscreteHybridContract {
 		this.setSamplingTime(samplingTime);
 	}
 
-	public String getSamplingTime() {
+	public String getSampleTime() {
 		return samplingTime;
 	}
 

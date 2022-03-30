@@ -43,14 +43,14 @@ import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelFromSimulink;
+import simulink2dl.transform.dlmodel.TransformedDLModel;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
 import simulink2dl.util.PluginLogger;
 
 public class InportTransformer extends BlockTransformer {
 
-	public InportTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
+	public InportTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 	/**
@@ -96,8 +96,8 @@ public class InportTransformer extends BlockTransformer {
 		dlModel.addInitialCondition(limitFormula);
 		
 		// add nondeterministic assignment for "continuous" input
-		dlModel.addToContinousInput(new NondeterministicAssignment(variable));
-		dlModel.addToContinousInput(new TestFormula(limitFormula));
+		dlModel.addContinousInput(new NondeterministicAssignment(variable));
+		dlModel.addContinousInput(new TestFormula(limitFormula));
 	}
 
 	@Override

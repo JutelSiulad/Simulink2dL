@@ -39,6 +39,7 @@ import simulink2dl.dlmodel.operator.formula.BooleanConstant;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Disjunction;
 import simulink2dl.dlmodel.operator.formula.Formula;
+import simulink2dl.transform.dlmodel.TransformedDLModel;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalChoice;
 import simulink2dl.transform.macro.ConditionalMacro;
 import simulink2dl.transform.macro.Macro;
@@ -58,11 +59,11 @@ import simulink2dl.util.satisfiability.FormulaChecker.ResultType;
  * @author Timm Liebrenz
  *
  */
-public class ContinuousEvolutionBehavior {
+public class ContinuousEvolutionHandler {
 
 	private List<ContinuousEvolutionContainer> evolutions;
 
-	public ContinuousEvolutionBehavior() {
+	public ContinuousEvolutionHandler() {
 		this.evolutions = new LinkedList<ContinuousEvolutionContainer>();
 	}
 
@@ -208,6 +209,13 @@ public class ContinuousEvolutionBehavior {
 		}
 		return conditionalChoice;
 	}
+	
+	/**
+	 * Creates the hybrid programs that represent the continuous behavior.
+	 */
+	public void addToModel(TransformedDLModel dlModel) {
+		dlModel.addContinousBehavior(this.asHybridProgram());
+	}
 
 	/**
 	 * For debugging purpose.
@@ -238,7 +246,7 @@ public class ContinuousEvolutionBehavior {
 		}
 	}
 	
-	public ContinuousEvolutionBehavior expand() {
+	public ContinuousEvolutionHandler expand() {
 		for(ContinuousEvolutionContainer evolution : evolutions) {
 			evolution.expand();
 		}

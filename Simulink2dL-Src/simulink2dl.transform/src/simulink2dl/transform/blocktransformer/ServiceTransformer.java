@@ -45,25 +45,25 @@ import simulink2dl.dlmodel.contracts.ContinuousHybridContract;
 import simulink2dl.dlmodel.contracts.GhostVariable;
 import simulink2dl.dlmodel.contracts.HybridContract;
 import simulink2dl.dlmodel.contracts.RLAgentContract;
+import simulink2dl.dlmodel.contracts.TimedContract;
 import simulink2dl.dlmodel.contracts.hardcoded.TemperatureControlContract;
 import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
 import simulink2dl.dlmodel.hybridprogram.HybridProgramCollection;
 import simulink2dl.dlmodel.hybridprogram.NondeterministicAssignment;
-import simulink2dl.dlmodel.operator.formula.Formula;
+import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.DLModelFromSimulink;
-import simulink2dl.transform.dlmodel.hybridprogram.ServiceAsHybridProgram;
+import simulink2dl.transform.dlmodel.TransformedDLModel;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
-import simulink2dl.transform.model.ConcurrentContractBehavior;
-import simulink2dl.transform.model.DiscreteContractBehavior;
+import simulink2dl.transform.model.TimedContractBehavior;
 import simulink2dl.util.PluginLogger;
-/** Service transformer for the SimulinkRL2dL project.
+
+/** Service transformer for the Simulink2dL project.
  * TODO: Rework contract implementation.
  * - Use parser instead of hard-coded contracts.
  * - Delete Contract interface, which only exists to support deprecated SimpleContract.
@@ -72,7 +72,7 @@ public class ServiceTransformer extends BlockTransformer {
 	protected List<Variable> inputVariables;
 	protected List<Variable> outputVariables;
 	
-	public ServiceTransformer(SimulinkModel simulinkModel, DLModelFromSimulink dlModel, Environment environment) {
+	public ServiceTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 		
 		this.inputVariables = new LinkedList<Variable>();
@@ -83,13 +83,103 @@ public class ServiceTransformer extends BlockTransformer {
 		List<HybridContract> contracts = createContracts(dlModel, block.getName());
 		transformContracts(contracts, block);
 	}
+	
 	/**
-	 * add input behavior
+	 * Transform contract to HP
+	 * @param contracts
+	 * @param block
+	 */
+	private void transformContracts(List<HybridContract> contracts, SimulinkBlock block) {
+
+		List<Macro> inputMacros = new LinkedList<Macro>();
+		List<Macro> outputMacros = new LinkedList<Macro>();
+		
+		Conjunction initConditions = new Conjunction();
+		HybridProgramCollection ghostAssignments = new HybridProgramCollection();
+		HybridProgramCollection contractAssignments = new HybridProgramCollection();
+		HybridProgramCollection contractFormulas = new HybridProgramCollection();
+		
+		LinkedList<Constant> constants = new LinkedList<Constant>();
+		LinkedList<Variable> contractVariables = new LinkedList<Variable>();
+		LinkedList<Variable> ghostVariables = new LinkedList<Variable>();
+		
+		// preparations
+		for(HybridContract contract : contracts) {
+			addInputMacros(contract, block, inputMacros);
+			addGhostAssignments(contract, ghostAssignments, ghostVariables);
+			addContractAssignments(contract, block, contractAssignments, contractVariables, outputMacros);
+			addConstants(contract, constants);
+			initConditions.addElement(contract.asFormula());
+			contractFormulas.addElement(contract.asTestFormula());
+		}
+		
+		// replace internal contract variables with inputs from surrounding model
+		applyInputMacros(inputMacros, initConditions, ghostAssignments, contractAssignments, contractFormulas);
+		
+		//add Variables to model
+		for (Constant constant : constants) {
+			dlModel.addConstant(constant);
+		}
+		for (Variable variable : contractVariables) {
+			dlModel.addVariable(variable);
+		}
+		for (Variable variable : ghostVariables) {
+			dlModel.addVariable(variable);
+		}
+		
+		//add contracts to model
+		HybridContract firstContract = contracts.get(0); //assumption: all contracts in the list are from the same class, TODO add method to check this 
+		if(firstContract instanceof TimedContract || firstContract instanceof RLAgentContract) {
+			String sampleTime = ((RLAgentContract)firstContract).getSampleTime();
+			addTimedContracts(dlModel, initConditions, ghostAssignments, contractAssignments, contractFormulas, constants, contractVariables, sampleTime);
+			if(firstContract instanceof RLAgentContract) {
+				dlModel.addRLContractsToModel(contracts);
+			}
+		} else if (firstContract instanceof ContinuousHybridContract) {
+			addContinuousContracts(dlModel, initConditions, ghostAssignments, contractAssignments, contractFormulas, constants, contractVariables);
+		} else {
+			addDiscreteContracts(dlModel, initConditions, ghostAssignments, contractAssignments, contractFormulas, constants, contractVariables);
+		}
+		
+		for(Macro outputMacro : outputMacros) {
+			dlModel.addMacro(outputMacro);
+		}
+		
+
+	}
+
+	@Override
+	public List<Macro> createMacro(SimulinkBlock block) {
+		// TODO Auto-generated method stub
+		List<Macro> macros = new ArrayList<>();
+		PluginLogger.error("createMacro() is not yet implemented for " + this.getClass().getSimpleName());
+		return macros;
+	}
+
+	// TODO temporary solution, fixed contracts
+	// TODO later on: provide contracts in file
+	protected List<HybridContract> createContracts(DLModel model, String serviceName) {
+		List<HybridContract> contracts = new LinkedList<HybridContract>();
+		//contract for non RL overriden in RL ServiceTransformer
+		if (serviceName.endsWith("TemperatureControl")) {
+			Constant smallstep = dlModel.getConstantByName("SMALLSTEPSIZE");
+			contracts.add(new TemperatureControlContract(serviceName, smallstep));
+		} else {
+			PluginLogger.error("No contract creation given for service type: " + serviceName);
+			return null;
+		}
+		return contracts;
+	}
+	
+	
+	
+	/**
+	 * add macros for replacing contract inputs with surrounding inputs to list
 	 * @param contract
 	 * @param block
-	 * @param contractHP
+	 * @param inputMacros
 	 */
-	private void handleInputs(HybridContract contract, SimulinkBlock block, List<Macro> contractMacros) {
+	private void addInputMacros(HybridContract contract, SimulinkBlock block, List<Macro> inputMacros) {
 		LinkedList<Variable> inputs = contract.getInputs();
 		Iterator<Variable> inputIterator = inputs.iterator();
 		List<SimulinkInPort> inPorts= sortWithIndexIn(block.getInPorts());
@@ -100,7 +190,7 @@ public class ServiceTransformer extends BlockTransformer {
 			String connectedPortID = environment.getPortID(connectedPort);
 			ReplaceableTerm inputTerm = new PortIdentifier(connectedPortID);
 			ReplaceableTerm contractTermToReplace = inputIterator.next();
-			contractMacros.add(new SimpleMacro(contractTermToReplace,inputTerm));
+			inputMacros.add(new SimpleMacro(contractTermToReplace,inputTerm));
 		}
 	}
 	
@@ -139,33 +229,29 @@ public class ServiceTransformer extends BlockTransformer {
 	}
 	
 	/**
-	 * add ghost variables and assignments
+	 * add ghost variables and assignments to lists
 	 * @param contract
-	 * @param block
-	 * @param contractHP
+	 * @param ghostAssignments
+	 * @param ghostVariables
 	 */
-	private void handleGhosts(HybridContract contract, SimulinkBlock block, HybridProgramCollection contractHP) {
-		if (contract instanceof ContinuousHybridContract) {
-			for (GhostVariable variable : contract.getGhostVariables()) {
-				if(dlModel.getVariableByName(variable.getName())==null) {
-					contractHP.addElement(new DiscreteAssignment(variable, variable.getAssignedTerm()));
-					dlModel.addVariable(variable);
-				}
-			}
-		} else {
-			for (GhostVariable variable : contract.getGhostVariables()) {
-				contractHP.addElement(new DiscreteAssignment(variable, variable.getAssignedTerm()));
-				dlModel.addVariable(variable);
+	private void addGhostAssignments(HybridContract contract, HybridProgramCollection ghostAssignments, LinkedList<Variable> ghostVariables) {
+		for (GhostVariable gVariable : contract.getGhostVariables()) {
+			if(ghostVariables.contains(gVariable)) {
+				ghostAssignments.addElement(new DiscreteAssignment(gVariable, gVariable.getAssignedTerm()));
+				ghostVariables.add(gVariable);
 			}
 		}
 	}
+
 	/**
-	 * add output behavior
+	 * add output assignments to list
 	 * @param contract
 	 * @param block
-	 * @param contractHP
+	 * @param outputAssignments
+	 * @param outputVariables
+	 * @param outputMacros
 	 */
-	private void handleOutputs(HybridContract contract, SimulinkBlock block, HybridProgramCollection contractHP) {
+	private void addContractAssignments(HybridContract contract, SimulinkBlock block, HybridProgramCollection outputAssignments, LinkedList<Variable> outputVariables, List<Macro> outputMacros) {
 		LinkedList<Variable> outputs = contract.getOutputVariables();
 		Iterator<Variable> outputIterator = outputs.iterator();
 		List<SimulinkOutPort> outPorts = sortWithIndexOut(block.getOutPorts());
@@ -174,162 +260,59 @@ public class ServiceTransformer extends BlockTransformer {
 		while(outputIterator.hasNext() && outPortIterator.hasNext()) {
 			Variable variable = outputIterator.next();
 			SimulinkOutPort outPort = outPortIterator.next();
-			if(!this.outputVariables.contains(variable)) {
-				dlModel.addVariable(variable);
-				this.outputVariables.add(variable);
-				
-				contractHP.addElement(new NondeterministicAssignment(variable));
-				
+			if(!outputVariables.contains(variable)) {
+				outputVariables.add(variable);
+				outputAssignments.addElement(new NondeterministicAssignment(variable));
 			}
 			Term replaceWith = variable;
-			dlModel.addMacro(new SimpleMacro(environment.getToReplace(outPort), replaceWith));
+			outputMacros.add(new SimpleMacro(environment.getToReplace(outPort), replaceWith));
 		}
 	}
 	
 	/**
-	 * add constants introduced by the contracts
+	 * add contract constants to list
 	 * @param contract
-	 * @param block
-	 * @param contractHP
+	 * @param constants
 	 */
-	private void addConstants(HybridContract contract, DLModel model) {
+	private void addConstants(HybridContract contract, List<Constant> constants) {
 		for (Constant constant : contract.getConstants()) {
-			dlModel.addConstant(constant);
+			if(!constants.contains(constant)) {
+				constants.add(constant);
+			}
+		}
+	}
+
+	private void applyInputMacros(List<Macro> inputMacros, Conjunction initialCondition, HybridProgramCollection ghostAssignments, HybridProgramCollection contractAssignments, HybridProgramCollection contractFormulas) {
+		for(Macro inputMacro : inputMacros) {
+			inputMacro.applyToHybridProgramCollection(ghostAssignments);
+			inputMacro.applyToHybridProgramCollection(contractAssignments);
+			inputMacro.applyToHybridProgramCollection(contractFormulas);
+			inputMacro.applyToInitialConditions(initialCondition);
 		}
 	}
 	
-	/**
-	 * add contracts to initial conditions
-	 * TODO should this always be done for all contracts?
-	 * @param contract
-	 * @param block
-	 * @param contractHP
-	 */
-	private void addToInitConditions(DLModel model, List<HybridContract> contracts, List<Macro> contractMacros) {
+	private void addContinuousContracts(TransformedDLModel dlModel, Conjunction initialCondition, HybridProgramCollection ghostAssignments, HybridProgramCollection contractAssignments, HybridProgramCollection contractFormulas, LinkedList<Constant> constants, LinkedList<Variable> outputVariables) {
+		/* create contract capturing behavior of services that show continuous/concurrent behavior */
+		dlModel.addInitialCondition(initialCondition);
+		if(!ghostAssignments.isEmpty()) 	dlModel.addGhostAssignment(ghostAssignments);
+		if(!contractAssignments.isEmpty()) 	dlModel.addContinuousContractAssignment(contractAssignments);
+		if(!contractFormulas.isEmpty()) 	dlModel.addContinuousContractTest(contractFormulas);
+	}
 	
-		List<Formula> initConditions = new LinkedList<Formula>();
-		for(HybridContract contract: contracts) {
-			initConditions.add(contract.asFormula());
-		}
+	private void addDiscreteContracts(TransformedDLModel dlModel, Conjunction initialCondition, HybridProgramCollection ghostAssignments, HybridProgramCollection contractAssignments, HybridProgramCollection contractFormulas, LinkedList<Constant> constants, LinkedList<Variable> outputVariables) {
+		dlModel.addInitialCondition(initialCondition);
+		if(!ghostAssignments.isEmpty()) 	dlModel.addGhostAssignment(ghostAssignments);
+		if(!contractAssignments.isEmpty()) 	dlModel.addDiscreteBehavior(contractAssignments);
+		if(!contractFormulas.isEmpty())		dlModel.addDiscreteBehavior(contractFormulas);
+	}
 	
-		for(Formula condition: initConditions) {
-			/* Replace internal names of the contract inputs with port identifiers */
-			for(Macro macro: contractMacros) {
-				if (condition.containsTerm(macro.getToReplace())) {
-					condition.replaceTermRecursive(macro.getToReplace(), macro.getReplaceWith());
-				}
-			}
-			dlModel.addInitialCondition(condition);
-		}
-	}
-
-	/**
-	 * Transform contract to HP
-	 * @param contract
-	 * @param block
-	 * @param contractHP
-	 */
-	private void transformContracts(List<HybridContract> contracts, SimulinkBlock block) {
-
-		List<Macro> contractMacros = new LinkedList<Macro>();
-		HybridProgramCollection ghostAssignments = new HybridProgramCollection();
-		HybridProgramCollection outputAssignments = new HybridProgramCollection();
-		
-		for(HybridContract contract : contracts) {
-				handleGhosts(contract, block, ghostAssignments);
-				handleInputs(contract, block, contractMacros);
-				handleOutputs(contract, block, outputAssignments);
-				addConstants(contract, dlModel);
-		}
-		addToDlModel(dlModel, contracts, ghostAssignments, outputAssignments, contractMacros);
-		addToInitConditions(dlModel, contracts, contractMacros);
-	}
-	/**
-	 * add contracts to the dL model.
-	 * @param dlModel
-	 * @param contract
-	 * @param contractHP
-	 * @param contractMacros
-	 */
-	private void addToDlModel(DLModelFromSimulink dlModel, List<HybridContract> contracts, HybridProgramCollection ghostAssignments, HybridProgramCollection outputAssignments, List<Macro> contractMacros) {
-		// add contract information to the system behavior
-		
-		//TODO: contracts for the same service should all be of the same type.
-		
-		ServiceAsHybridProgram contractHP = new ServiceAsHybridProgram();
-		if (contracts != null) {
-			dlModel.addContracts(contracts);
-			
-			for(HybridContract contract : contracts) {
-				contractHP.addElement(contract.asTestFormula());
-			}
-			
-			for(Macro macro : contractMacros) {
-				macro.applyToHybridProgramCollection(contractHP);
-				macro.applyToHybridProgramCollection(ghostAssignments);
-				macro.applyToHybridProgramCollection(outputAssignments);
-			}
-
-			if(contracts.get(0) instanceof RLAgentContract) {
-				/* create contract HP that acts in sampling intervals used for the RL agent */
-				//TODO all RL agent contracts should refer to the same sampling time.
-				DiscreteContractBehavior discreteBehavior = new DiscreteContractBehavior(((RLAgentContract)contracts.get(0)).getSamplingTime()); 
-				if(!ghostAssignments.isEmpty())
-					discreteBehavior.addBehavior(ghostAssignments);
-				if(!outputAssignments.isEmpty())
-					discreteBehavior.addBehavior(outputAssignments);
-				if(!contractHP.isEmpty())
-					discreteBehavior.addBehavior(contractHP);
-				discreteBehavior.addDiscreteContract(dlModel);
-				dlModel.addRLContractsToModel(contracts);
-			} else if (contracts.get(0) instanceof ContinuousHybridContract) {
-				/* create contract capturing behavior of services that show continuous/concurrent behavior */
-				ConcurrentContractBehavior concurrentContractHP = dlModel.getConcurrentContractBehavior();
-				if(!ghostAssignments.isEmpty())
-					concurrentContractHP.addGhostAssignments(ghostAssignments);
-				if(!outputAssignments.isEmpty())
-					concurrentContractHP.addOutputAssignments(outputAssignments);
-				if(!contractHP.isEmpty())
-					concurrentContractHP.addHP(contractHP);
-			} else {
-				/* create contract HP for 'normal' services */
-				if(!outputAssignments.isEmpty())
-					contractHP.addElementFront(outputAssignments);
-				if(!ghostAssignments.isEmpty())
-					contractHP.addElementFront(ghostAssignments);
-				dlModel.addBehavior(contractHP);
-			}
-		}
-	}
-
-	@Override
-	public List<Macro> createMacro(SimulinkBlock block) {
-		// TODO Auto-generated method stub
-		List<Macro> macros = new ArrayList<>();
-		PluginLogger.error("createMacro() is not yet implemented for " + this.getClass().getSimpleName());
-		return macros;
-	}
-
-	// TODO temporary solution, fixed contracts
-	// TODO later on: provide contracts in file
-	protected List<HybridContract> createContracts(DLModel model, String serviceName) {
-		List<HybridContract> contracts = new LinkedList<HybridContract>();
-		//contract for non RL
-		if (serviceName.endsWith("TemperatureControl")) {
-			Constant smallstep = dlModel.getConstantByName("SMALLSTEPSIZE");
-			contracts.add(new TemperatureControlContract(serviceName, smallstep));
-//		} else if (serviceName.endsWith("CounterNeg9to0")) {
-//			contracts.add(new CounterContract(serviceName));
-//		} else if (serviceName.endsWith("DiscreteDifference")) {
-//			contracts.add(new DiscreteDifferenceContract(serviceName));
-//		} else if (serviceName.endsWith("Abstandsrechner1") || serviceName.endsWith("Abstandsrechner2")) {
-//			contract = new AbstandsrechnerNoOverflowContract(dlModel, serviceName);
-//			contracts.add(new AbstandsrechnerCorrectGainContract(serviceName));
-		} else {
-			PluginLogger.error("No contract creation given for service type: " + serviceName);
-			return null;
-		}
-		return contracts;
+	private void addTimedContracts(TransformedDLModel dlModel, Conjunction initialCondition, HybridProgramCollection ghostAssignments, HybridProgramCollection contractAssignments, HybridProgramCollection contractFormulas, LinkedList<Constant> constants, LinkedList<Variable> outputVariables, String sampleTime) {
+		dlModel.addInitialCondition(initialCondition);
+		TimedContractBehavior discreteBehavior = new TimedContractBehavior(sampleTime);
+		if(!ghostAssignments.isEmpty()) 	discreteBehavior.addBehavior(ghostAssignments);
+		if(!contractAssignments.isEmpty()) 	discreteBehavior.addBehavior(contractAssignments);
+		if(!contractFormulas.isEmpty())		discreteBehavior.addBehavior(contractFormulas);
+		discreteBehavior.addDiscreteContract(dlModel);
 	}
 
 }

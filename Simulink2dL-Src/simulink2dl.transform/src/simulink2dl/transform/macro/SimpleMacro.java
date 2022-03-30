@@ -37,7 +37,7 @@ import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.dlmodel.term.VectorTerm;
 import simulink2dl.transform.dlmodel.term.ExpandedTerm;
-import simulink2dl.transform.model.ContinuousEvolutionBehavior;
+import simulink2dl.transform.model.ContinuousEvolutionHandler;
 import simulink2dl.util.PluginLogger;
 
 /**
@@ -158,7 +158,7 @@ public class SimpleMacro extends Macro {
 	}
 
 	@Override
-	public void applyToContinuousBehavior(ContinuousEvolutionBehavior continuousBehavior) {
+	public void applyToContinuousBehavior(ContinuousEvolutionHandler continuousBehavior) {
 		continuousBehavior.applySimpleMacro(this);
 	}
 

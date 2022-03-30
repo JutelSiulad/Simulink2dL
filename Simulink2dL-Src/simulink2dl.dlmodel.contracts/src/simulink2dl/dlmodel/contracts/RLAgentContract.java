@@ -36,4 +36,5 @@ public class RLAgentContract extends TimedContract {
 	public RLAgentContract(String samplingTime) {
 		super(samplingTime);
 	}
+
 }

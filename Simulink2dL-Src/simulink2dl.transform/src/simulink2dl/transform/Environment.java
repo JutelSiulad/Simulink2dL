@@ -54,7 +54,7 @@ import simulink2dl.dlmodel.term.AdditionTerm;
 import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
-import simulink2dl.transform.dlmodel.DLModelFromSimulink;
+import simulink2dl.transform.dlmodel.TransformedDLModel;
 import simulink2dl.util.PluginLogger;
 import simulink2dl.util.simulink_transformer.PortMapping;
 
@@ -68,7 +68,7 @@ import simulink2dl.util.simulink_transformer.PortMapping;
  */
 public class Environment {
 
-	private DLModelFromSimulink dlModel;
+	private TransformedDLModel dlModel;
 
 	private SimulinkModel simulinkModel;
 
@@ -87,7 +87,7 @@ public class Environment {
 	/**
 	 * Private constructor
 	 */
-	public Environment(DLModelFromSimulink dlModel, SimulinkModel simulinkModel, Set<DiscreteHybridContract> contracts) {
+	public Environment(TransformedDLModel dlModel, SimulinkModel simulinkModel, Set<DiscreteHybridContract> contracts) {
 		this.dlModel = dlModel;
 		this.simulinkModel = simulinkModel;
 		this.contracts = contracts;

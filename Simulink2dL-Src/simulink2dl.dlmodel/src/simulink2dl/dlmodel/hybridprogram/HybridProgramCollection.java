@@ -69,6 +69,10 @@ public class HybridProgramCollection implements HybridProgram {
 		hps.addAll(sequence);
 		return hps;
 	}
+	
+	public List<HybridProgram> getSequence() {
+		return sequence;
+	}
 
 	
 	public boolean isEmpty() {

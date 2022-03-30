@@ -29,7 +29,7 @@
 package simulink2dl.transform.model;
 
 import simulink2dl.dlmodel.hybridprogram.HybridProgramCollection;
-import simulink2dl.transform.dlmodel.DLModelFromSimulink;
+import simulink2dl.transform.dlmodel.TransformedDLModel;
 
 public class ConcurrentContractBehavior {
 	
@@ -63,15 +63,15 @@ public class ConcurrentContractBehavior {
 	}
 	
 	
-	public void addToModelHandler(DLModelFromSimulink modelHandler) {
+	public void addToModelHandler(TransformedDLModel modelHandler) {
 		if(concurrentContractGhostAssignments!=null) {
-			modelHandler.addBehavior(concurrentContractGhostAssignments);
+			modelHandler.addToHybridProgram(concurrentContractGhostAssignments);
 		}
 		if(concurrentContractOutputAssignments!=null) {
-			modelHandler.addBehavior(concurrentContractOutputAssignments);
+			modelHandler.addToHybridProgram(concurrentContractOutputAssignments);
 		}
 		if(concurrentContractsAsHPs!=null) {
-			modelHandler.addBehavior(concurrentContractsAsHPs);
+			modelHandler.addToHybridProgram(concurrentContractsAsHPs);
 		}
 	}
 	

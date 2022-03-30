@@ -45,7 +45,7 @@ public class DLModelDefaultStructure extends DLModel {
 
 	private NondeterministicRepetition loop;
 
-	protected HybridProgramCollection behavior;
+	protected HybridProgramCollection hybridProgram;
 
 	public DLModelDefaultStructure() {
 		super();
@@ -55,8 +55,8 @@ public class DLModelDefaultStructure extends DLModel {
 		// ->
 		// [behavior]true
 		initialConditions = new Conjunction();
-		behavior = new HybridProgramCollection();
-		loop = new NondeterministicRepetition(behavior);
+		hybridProgram = new HybridProgramCollection();
+		loop = new NondeterministicRepetition(hybridProgram);
 		outerModality = new BoxModality(loop, new BooleanConstant(true));
 
 		Implication problem = new Implication(initialConditions, outerModality);
@@ -68,13 +68,13 @@ public class DLModelDefaultStructure extends DLModel {
 		initialConditions.addElement(newElement);
 	}
 
-	public void addBehavior(HybridProgram newBehavior) {
+	public void addToHybridProgram(HybridProgram newBehavior) {
 		if(newBehavior!=null)
-		behavior.addElement(newBehavior);
+		hybridProgram.addElement(newBehavior);
 	}
 
 	public HybridProgramCollection getBehavior() {
-		return behavior;
+		return hybridProgram;
 	}
 
 	public NondeterministicRepetition getLoop() {

@@ -45,14 +45,13 @@ import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Formula;
 import simulink2dl.dlmodel.operator.formula.Implication;
 import simulink2dl.dlmodel.operator.formula.Relation;
-import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.dlmodel.term.RealTerm;
 /** Contract Superclass used for the SimulinkRL2dL project.
  * TODO: Rework contract implementation.
  * - Use parser instead of hard-coded contracts.
  * - Delete Contract interface, which only exists to support deprecated SimpleContract.
 */
-public class HybridContract {
+public abstract class HybridContract {
 	// useful terms for easing hard coded contract definition
 	// TODO remove when implementing parser
 	protected static RealTerm ZERO = new RealTerm(0);
@@ -71,9 +70,6 @@ public class HybridContract {
 	// contract identifier 
 	// TODO not used
 	private String id;
-
-	// contract flags
-	private boolean containsContinuousVariable;
 
 	// actual assumption-guarantee pair
 	private Conjunction assumptions;
@@ -199,22 +195,10 @@ public class HybridContract {
 			hp.addElement(new NondeterministicAssignment(var));
 		}
 		hp.addElement(this.asTestFormula());
-		contractDL.addBehavior(hp);
+		contractDL.addToHybridProgram(hp);
 		contractDL.addInitialCondition(new BooleanConstant(true));
 		return contractDL;
 	}
-	
-	
-	public void setContainsContinuousVariable(boolean value) {
-		containsContinuousVariable = value;
-	}
-
-
-
-
-
-
-
 	
 	public String getId() {
 		return id;
@@ -228,5 +212,7 @@ public class HybridContract {
 	public void addGuarantee(Formula guarantee) {
 		guarantees.addElement(guarantee);
 	}
+
+
 
 }
