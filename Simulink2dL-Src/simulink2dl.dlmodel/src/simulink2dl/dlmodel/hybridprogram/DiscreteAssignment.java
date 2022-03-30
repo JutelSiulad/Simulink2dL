@@ -28,8 +28,6 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.hybridprogram;
 
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import simulink2dl.dlmodel.elements.Variable;

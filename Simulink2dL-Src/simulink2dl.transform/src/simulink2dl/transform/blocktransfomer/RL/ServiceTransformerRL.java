@@ -36,7 +36,6 @@ import java.util.List;
 import org.conqat.lib.simulink.model.SimulinkModel;
 
 import simulink2dl.dlmodel.DLModel;
-import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.dlmodel.contracts.HybridContract;
 import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.ArrivedCheckerContract;
 import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.AvoidOvershootingContract;

@@ -30,8 +30,6 @@ package simulink2dl.transform.dlmodel;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import simulink2dl.dlmodel.DLModel;
 import simulink2dl.dlmodel.DLModelDefaultStructure;
 import simulink2dl.dlmodel.contracts.HybridContract;
 import simulink2dl.dlmodel.elements.Constant;

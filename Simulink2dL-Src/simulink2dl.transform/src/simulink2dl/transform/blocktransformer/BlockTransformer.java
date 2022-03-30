@@ -31,8 +31,6 @@ package simulink2dl.transform.blocktransformer;
 import java.util.List;
 
 import org.conqat.lib.simulink.model.SimulinkBlock;
-import org.conqat.lib.simulink.model.SimulinkInPort;
-import org.conqat.lib.simulink.model.SimulinkLine;
 import org.conqat.lib.simulink.model.SimulinkModel;
 import org.conqat.lib.simulink.model.SimulinkOutPort;
 

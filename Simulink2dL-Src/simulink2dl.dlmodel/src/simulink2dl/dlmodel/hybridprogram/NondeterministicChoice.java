@@ -31,7 +31,6 @@ package simulink2dl.dlmodel.hybridprogram;
 import java.util.LinkedList;
 import java.util.List;
 
-import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.term.Term;
 
 /**

@@ -156,7 +156,6 @@ public class Environment {
 	public void prepareModel() {
 		if (useSmallStep) {
 			Constant stepSize;
-			Variable smallStep;
 			Relation initCondition;
 
 			// constant small step size

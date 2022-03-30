@@ -28,13 +28,11 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.hybridprogram;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.dlmodel.term.VectorTerm;
-import simulink2dl.util.PluginLogger;
 
 /**
  * This class represents a nondeterministic assignment of an arbitrary value to
