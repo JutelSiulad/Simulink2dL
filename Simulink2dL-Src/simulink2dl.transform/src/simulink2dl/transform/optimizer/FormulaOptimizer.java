@@ -36,6 +36,7 @@ import simulink2dl.dlmodel.operator.formula.BooleanConstant;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Disjunction;
 import simulink2dl.dlmodel.operator.formula.Formula;
+import simulink2dl.dlmodel.operator.formula.Implication;
 
 /**
  * This optimizer updates conjunctions and disjunctions. For conjunctions, it
@@ -66,7 +67,7 @@ public class FormulaOptimizer extends Optimizer {
 				replace = true;
 				break;
 			}
-			if (toCheck.equals(trueElement)) {
+			if (toCheck.equals(trueElement) || isTriviallyTrue(toCheck)) {
 				// remove true elements, i.e. do not add it to new element list
 				replace = true;
 				continue;
@@ -144,6 +145,31 @@ public class FormulaOptimizer extends Optimizer {
 			}
 			disjunction.setElements(newElements);
 		}
+	}
+	
+	static boolean isTriviallyTrue(Formula formula) {
+		if (formula instanceof Conjunction) {
+			Conjunction conjunction = (Conjunction) formula;
+			if(conjunction.getElements().size()==1 && conjunction.getElements().get(0).equals(new BooleanConstant(true))) {
+				return true;
+			}	
+		} else if (formula instanceof Disjunction) {
+			Disjunction conjunction = (Disjunction) formula;
+			if(conjunction.getElements().size()==1 && conjunction.getElements().get(0).equals(new BooleanConstant(true))) {
+				return true;
+			}
+				
+		} else if (formula.equals(new BooleanConstant(true)) || formula.equals(new Implication(new BooleanConstant(true),new BooleanConstant(true)))) {
+				return true;
+		} else if (formula instanceof Implication) {
+				Implication implication = (Implication)formula;
+				if(implication.getAntecedent() instanceof Formula && implication.getConsequent() instanceof Formula) {
+					if(isTriviallyTrue((Formula)implication.getAntecedent()) && isTriviallyTrue((Formula)implication.getConsequent())) {
+						return true;
+					}
+				}
+		}
+		return false;
 	}
 
 }

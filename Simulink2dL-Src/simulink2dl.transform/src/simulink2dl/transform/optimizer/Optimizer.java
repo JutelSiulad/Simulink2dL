@@ -148,6 +148,8 @@ public abstract class Optimizer {
 		// default formulas
 		if (formula instanceof Conjunction) {
 			Conjunction conjunction = (Conjunction) formula;
+			
+			
 			// recursive call
 			for (Operator elementOperator : conjunction.getElements()) {
 				Formula element = (Formula) elementOperator;
@@ -187,7 +189,7 @@ public abstract class Optimizer {
 			PluginLogger.error("Formula of type \"" + formula.getClass().getName() + "\" not handled in optimizer.");
 		}
 	}
-
+	
 	protected void handleContinuousEvolution(ContinuousEvolution conEvolution) {
 		// do nothing
 	}
@@ -197,7 +199,11 @@ public abstract class Optimizer {
 	}
 
 	protected void handleCollection(HybridProgramCollection hpCollection) {
-
+		
+		simplifyTriviallyTrueConditionalProgram(hpCollection);
+		
+		simplifyTriviallyTrueConditionalChoice(hpCollection);
+		
 		removeTrivialTests(hpCollection);
 		
 		trimCollection(hpCollection);
@@ -209,6 +215,34 @@ public abstract class Optimizer {
 		}
 		
 		
+	}
+	
+	protected void simplifyTriviallyTrueConditionalProgram(HybridProgramCollection hpCollection) {
+		List<HybridProgram> hps = hpCollection.getSequence();
+		for (int i = 0; i<hps.size(); i++) {
+			HybridProgram hp = hps.get(i);
+			if(hp instanceof ConditionalHybridProgram) {
+				if(FormulaOptimizer.isTriviallyTrue(((ConditionalHybridProgram)hp).getCondition())) {
+					hps.set(i, ((ConditionalHybridProgram)hp).getInnerProgram());
+				}
+			}
+		}
+	}
+	
+	protected void simplifyTriviallyTrueConditionalChoice(HybridProgramCollection hpCollection) {
+		List<HybridProgram> hps = hpCollection.getSequence();
+		for (int i = 0; i<hps.size(); i++) {
+			HybridProgram hp = hps.get(i);
+			if(hp instanceof ConditionalChoice) {
+				ConditionalChoice condChoice = (ConditionalChoice)hp;
+				if(condChoice.getChoices().size()==1) {
+					ConditionalHybridProgram onlyChoice = condChoice.getChoices().get(0);
+					if(FormulaOptimizer.isTriviallyTrue(onlyChoice.getCondition())) {
+						hps.set(i, onlyChoice.getInnerProgram());
+					}
+				}
+			}
+		}
 	}
 	
 	protected void trimCollection(HybridProgramCollection hpCollection) {
@@ -234,15 +268,14 @@ public abstract class Optimizer {
 			}
 		}
 	}
-	
-	//TODO
+
 	protected void removeTrivialTests(HybridProgramCollection hpCollection) {
 		List<HybridProgram> hps = hpCollection.getSequence();
 		for(int i = 0; i<hps.size();i++) {
 			HybridProgram hp = hps.get(i);
 			if(hp instanceof TestFormula) {
 				Formula test = ((TestFormula)hp).getFormula();
-				if(test.equals(new BooleanConstant(true)) || test.equals(new Implication(new BooleanConstant(true),new BooleanConstant(true)))) {
+				if(FormulaOptimizer.isTriviallyTrue(test)) {
 					hps.remove(i);
 					i--;
 				}
