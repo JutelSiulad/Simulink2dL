@@ -39,13 +39,13 @@ import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
 
 public class DataTypeConversionTransformer extends BlockTransformer {
 
-	public DataTypeConversionTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel,
+	public DataTypeConversionTransformer(SimulinkModel simulinkModel, TransformedSimulinkModel dlModel,
 			Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}

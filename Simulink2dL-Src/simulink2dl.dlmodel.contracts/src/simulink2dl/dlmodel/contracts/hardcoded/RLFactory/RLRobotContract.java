@@ -28,6 +28,7 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.contracts.hardcoded.RLFactory;
 
+import simulink2dl.dlmodel.contracts.ContinuousGhostVariable;
 import simulink2dl.dlmodel.contracts.ContinuousHybridContract;
 import simulink2dl.dlmodel.contracts.GhostVariable;
 import simulink2dl.dlmodel.elements.Constant;
@@ -62,7 +63,7 @@ public class RLRobotContract extends ContinuousHybridContract{
 			GhostVariable simTimeOld = new GhostVariable(simTime);
 
 			AdditionTerm TDiffCalc = new AdditionTerm(simTime); TDiffCalc.subtract(simTimeOld);
-			GhostVariable TDiff = new GhostVariable("tDiff", TDiffCalc);
+			ContinuousGhostVariable TDiff = new ContinuousGhostVariable("tDiff", TDiffCalc);
 			ghostVariables.add(TDiff);
 			ghostVariables.add(simTimeOld);
 		

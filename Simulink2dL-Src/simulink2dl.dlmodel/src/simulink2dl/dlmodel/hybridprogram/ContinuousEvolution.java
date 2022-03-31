@@ -140,7 +140,7 @@ public class ContinuousEvolution implements HybridProgram {
 			evolutionString += formula.toString();
 		}
 		if (evolutionDomain != null) {
-			return "(" + evolutionString + "&" + evolutionDomain.toString() + ")";
+			return "(" + evolutionString + "& " + evolutionDomain.toString() + ")";
 		} else {
 			return "(" + evolutionString + " & true)";
 		}
@@ -167,7 +167,7 @@ public class ContinuousEvolution implements HybridProgram {
 		} else {
 			evolutionDomainString = evolutionDomain.toString();
 		}
-		return "{\n" + indent + "  " + evolutionString + "\n" + indent + "&" + evolutionDomainString + "\n" + indent
+		return "{\n" + indent + "  " + evolutionString + "\n" + indent + "& " + evolutionDomainString + "\n" + indent
 				+ "}";
 	}
 	

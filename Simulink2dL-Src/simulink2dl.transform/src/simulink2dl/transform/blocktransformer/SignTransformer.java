@@ -42,7 +42,7 @@ import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.transform.macro.ConditionalMacro;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.MacroContainer;
@@ -50,7 +50,7 @@ import simulink2dl.transform.macro.SimpleMacro;
 
 public class SignTransformer extends BlockTransformer {
 
-	public SignTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
+	public SignTransformer(SimulinkModel simulinkModel, TransformedSimulinkModel dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 

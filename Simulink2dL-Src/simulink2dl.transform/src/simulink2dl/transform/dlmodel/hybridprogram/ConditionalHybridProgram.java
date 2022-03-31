@@ -132,4 +132,9 @@ public class ConditionalHybridProgram implements HybridProgram {
 		return terms;
 	}
 
+	public void setCondition(Formula newCondition) {
+		this.condition = newCondition;
+		
+	}
+
 }

@@ -35,13 +35,13 @@ import org.conqat.lib.simulink.model.SimulinkBlock;
 import org.conqat.lib.simulink.model.SimulinkModel;
 
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.util.PluginLogger;
 
 public class TerminatorTransformer extends BlockTransformer {
 
-	public TerminatorTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
+	public TerminatorTransformer(SimulinkModel simulinkModel, TransformedSimulinkModel dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 

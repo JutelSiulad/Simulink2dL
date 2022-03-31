@@ -76,6 +76,16 @@ public class DLModelDefaultStructure extends DLModel {
 	public HybridProgramCollection getHybridProgram() {
 		return hybridProgram;
 	}
+	
+	public Conjunction getInitialCondition() {
+		return initialConditions;
+	}
+	
+	public void setInitialCondition(Conjunction initialConditions) {
+		this.initialConditions = initialConditions;
+		this.setProblem(new Implication(this.initialConditions, outerModality));
+	}
+	
 
 	public NondeterministicRepetition getLoop() {
 		return loop;

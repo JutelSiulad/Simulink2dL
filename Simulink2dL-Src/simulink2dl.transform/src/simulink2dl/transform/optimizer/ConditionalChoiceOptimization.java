@@ -32,87 +32,80 @@ import java.util.LinkedList;
 import java.util.List;
 
 import simulink2dl.dlmodel.hybridprogram.HybridProgram;
-import simulink2dl.dlmodel.hybridprogram.HybridProgramCollection;
-import simulink2dl.dlmodel.operator.Operator;
-import simulink2dl.dlmodel.operator.formula.BooleanConstant;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
-import simulink2dl.dlmodel.operator.formula.Disjunction;
-import simulink2dl.dlmodel.operator.formula.Formula;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalChoice;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalHybridProgram;
 
 // Optimizations
-// 1. remove choices that have a contradiction in their conditions
-public class ContradictionOptimizer extends Optimizer {
+// 1. move conditions of outer choices into conditions of inner choices
+// 2. remove duplicates in conditions
+// 3. remove duplicates in evolution domains
 
-	@Override
-	protected void handleConditionalChoice(ConditionalChoice condChoice) {
-		// perform the optimization
+public abstract class ConditionalChoiceOptimization {
+
+	private static boolean combineConditionalChoices = true;
+
+
+	protected static void optimize(ConditionalChoice condChoice) {
+		if (combineConditionalChoices) {
+			// perform the optimization
+			optimizeConditionalChoices(condChoice);
+		}
+	}
+
+	/**
+	 * Combines conditional choices with inner conditional choices. Only applicable
+	 * if the inner program of a conditional choice is also a conditional choice.
+	 * 
+	 * @param program
+	 */
+	private static void optimizeConditionalChoices(ConditionalChoice program) {
 		List<ConditionalHybridProgram> toCheckList = new LinkedList<ConditionalHybridProgram>();
 		List<ConditionalHybridProgram> checkedList = new LinkedList<ConditionalHybridProgram>();
 		boolean replace = false;
 
-		toCheckList.addAll(condChoice.getChoices());
+		toCheckList.addAll(program.getChoices());
 
-		for (ConditionalHybridProgram conditionalProgram : toCheckList) {
-			Formula condition = conditionalProgram.getCondition();
-			if (!isFalse(condition)) {
+		while (!toCheckList.isEmpty()) {
+			// pop the first
+			ConditionalHybridProgram conditionalProgram = toCheckList.remove(0);
+
+			// only applicable if inner program is also a conditional choice
+			HybridProgram innerProgram = conditionalProgram.getInnerProgram();
+			if (!(innerProgram instanceof ConditionalChoice)) {
+				// add this conditional program to the checked list
 				checkedList.add(conditionalProgram);
-			} else {
-				// at least one change, replace is necessary
-				replace = true;
+				continue;
+			}
+			// at least one change, replace is necessary
+			replace = true;
+
+			ConditionalChoice innerChoice = (ConditionalChoice) innerProgram;
+			List<ConditionalHybridProgram> toIntegrateList = innerChoice.getChoices();
+
+			// add condition to conditions of all inner container
+			for (int i = 0; i < toIntegrateList.size(); i++) {
+				ConditionalHybridProgram toIntegrate = toIntegrateList.get(i);
+				Conjunction newCondition = new Conjunction();
+
+				// create new condition
+				// add outer condition
+				newCondition.addElement(conditionalProgram.getCondition().createDeepCopy());
+				// add inner condition
+				newCondition.addElement(toIntegrate.getCondition().createDeepCopy());
+
+				// add inner program
+				HybridProgram newProgram = toIntegrate.getInnerProgram().createDeepCopy();
+
+				// add the new program to the check list
+				toCheckList.add(i, new ConditionalHybridProgram(newCondition, newProgram));
 			}
 		}
 
 		// replace the original program by the new one
 		if (replace) {
-			if (checkedList.isEmpty()) {
-				// no valid choices, therefore add test for false
-				Formula newCondition = new BooleanConstant(false);
-				HybridProgram newProgram = new HybridProgramCollection();
-				checkedList.add(new ConditionalHybridProgram(newCondition, newProgram));
-			} else {
-				condChoice.setChoices(checkedList);
-			}
+			program.setChoices(checkedList);
 		}
-	}
-
-	private boolean isFalse(Formula condition) {
-		Formula falseElement = new BooleanConstant(false);
-		if (condition.equals(falseElement)) {
-			return true;
-		}
-
-		if (condition instanceof Conjunction) {
-			Conjunction conjunction = (Conjunction) condition;
-
-			for (Operator currentFormula : conjunction.getElements()) {
-				// if the negation of this formula is also in this conjunction,
-				// it contains a contradiction
-				if (currentFormula.equals(falseElement)) {
-					return true;
-				}
-			}
-		}
-
-		if (condition instanceof Disjunction) {
-			Disjunction disjunction = (Disjunction) condition;
-
-			List<Operator> toCheck = new LinkedList<Operator>();
-			toCheck.addAll(disjunction.getElements());
-			while (!toCheck.isEmpty()) {
-				Operator currentFormula = toCheck.remove(0);
-
-				// if the negation of this formula is also in this conjunction,
-				// it
-				// contains a contradiction
-				if (currentFormula.equals(falseElement)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
 	}
 
 }

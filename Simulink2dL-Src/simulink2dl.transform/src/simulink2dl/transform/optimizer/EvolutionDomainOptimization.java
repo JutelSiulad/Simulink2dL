@@ -48,10 +48,9 @@ import simulink2dl.dlmodel.operator.formula.Formula;
  * @author Timm Liebrenz
  *
  */
-public class EvolutionDomainOptimizer extends Optimizer {
+public abstract class EvolutionDomainOptimization {
 
-	@Override
-	protected void handleContinuousEvolution(ContinuousEvolution continuousEvolution) {
+	protected static void optimize(ContinuousEvolution continuousEvolution) {
 		List<Variable> evolutionVariables = new LinkedList<Variable>();
 
 		for (DifferentialEquation evolution : continuousEvolution.getEvolutionFormulas()) {
@@ -60,10 +59,10 @@ public class EvolutionDomainOptimizer extends Optimizer {
 
 		Formula domain = continuousEvolution.getEvolutionDomain();
 
-		this.handleDomain(domain, evolutionVariables);
+		handleDomain(domain, evolutionVariables);
 	}
 
-	private void handleDomain(Formula formula, List<Variable> evolutionVariables) {
+	private static void handleDomain(Formula formula, List<Variable> evolutionVariables) {
 		if (formula instanceof Conjunction) {
 			handleConjunction((Conjunction) formula, evolutionVariables);
 		} else if (formula instanceof Disjunction) {
@@ -71,7 +70,7 @@ public class EvolutionDomainOptimizer extends Optimizer {
 		}
 	}
 
-	private void handleConjunction(Conjunction conjunction, List<Variable> evolutionVariables) {
+	private static void handleConjunction(Conjunction conjunction, List<Variable> evolutionVariables) {
 		List<Operator> elements = conjunction.getElements();
 		List<Operator> newElements = new LinkedList<Operator>();
 
@@ -88,7 +87,7 @@ public class EvolutionDomainOptimizer extends Optimizer {
 		conjunction.setElements(newElements);
 	}
 
-	private void handleDisjunction(Disjunction disjunction, List<Variable> evolutionVariables) {
+	private static void handleDisjunction(Disjunction disjunction, List<Variable> evolutionVariables) {
 		for (Operator element : disjunction.getElements()) {
 			// TODO extend this
 			if (element instanceof Formula) {
@@ -97,7 +96,7 @@ public class EvolutionDomainOptimizer extends Optimizer {
 		}
 	}
 
-	private boolean containsEvolutionVariable(Operator formula, List<Variable> evolutionVariables) {
+	private static boolean containsEvolutionVariable(Operator formula, List<Variable> evolutionVariables) {
 		for (Variable variable : evolutionVariables) {
 			if (formula.containsTerm(variable)) {
 				return true;

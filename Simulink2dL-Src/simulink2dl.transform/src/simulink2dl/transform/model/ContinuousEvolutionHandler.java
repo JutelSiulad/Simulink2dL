@@ -39,7 +39,7 @@ import simulink2dl.dlmodel.operator.formula.BooleanConstant;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Disjunction;
 import simulink2dl.dlmodel.operator.formula.Formula;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalChoice;
 import simulink2dl.transform.macro.ConditionalMacro;
 import simulink2dl.transform.macro.Macro;
@@ -213,7 +213,7 @@ public class ContinuousEvolutionHandler {
 	/**
 	 * Creates the hybrid programs that represent the continuous behavior.
 	 */
-	public void addToModel(TransformedDLModel dlModel) {
+	public void addToModel(TransformedSimulinkModel dlModel) {
 		dlModel.addContinousBehavior(this.asHybridProgram());
 	}
 

@@ -55,12 +55,11 @@ import simulink2dl.transform.model.TimedContractBehavior;
 import simulink2dl.transform.model.container.ContinuousEvolutionContainer;
 import simulink2dl.util.PluginLogger;
 
-public class TransformedDLModel extends DLModelDefaultStructure {
+public class TransformedSimulinkModel extends DLModelDefaultStructure {
 
 	private List<Macro> macros;
 	private List<HybridContract> rLContracts;
 	private List<TimedBehaviorHandler> timedBehaviorHandlers;
-	private ConcurrentContractBehavior concurrentContracts;
 	private HybridProgramCollection unsortedOutpus;
 	private ContinuousEvolutionHandler continuousEvolutionHandler;
 	
@@ -71,23 +70,18 @@ public class TransformedDLModel extends DLModelDefaultStructure {
 	private HybridProgramCollection discreteBehavior;
 	private HybridProgramCollection discreteOutputBehavior;
 	private HybridProgramCollection continousBehavior;
+	private HybridProgramCollection contractContinousGhostAssignment;
 	private HybridProgramCollection continousOutputBehavior;
 	private HybridProgramCollection continuousContractAssignments;
 	private HybridProgramCollection continuousContractTests;
 	private HybridProgramCollection continuousInputBehavior;
 	private HybridProgramCollection continuousInputTests;
-	
-	@Deprecated
-	protected HybridProgramCollection contractBehavior;
-
-	protected List<HybridContract> contracts;
 
 	private Variable simClock;
 
-	public TransformedDLModel() {
+	public TransformedSimulinkModel() {
 		rLContracts = new LinkedList<HybridContract>();
 		macros = new LinkedList<Macro>();
-		contracts = new LinkedList<HybridContract>();
 		timedBehaviorHandlers = new LinkedList<TimedBehaviorHandler>();
 		continuousEvolutionHandler = new ContinuousEvolutionHandler();
 		unsortedOutpus = new HybridProgramCollection();
@@ -100,11 +94,13 @@ public class TransformedDLModel extends DLModelDefaultStructure {
 		discreteBehavior = new HybridProgramCollection();
 		discreteOutputBehavior = new HybridProgramCollection();
 		continousBehavior = new HybridProgramCollection();
+		contractContinousGhostAssignment = new HybridProgramCollection();
 		continousOutputBehavior = new HybridProgramCollection();
 		continuousContractAssignments  = new HybridProgramCollection();
 		continuousContractTests = new HybridProgramCollection();
 		continuousInputBehavior = new HybridProgramCollection();
 		continuousInputTests = new HybridProgramCollection();
+		
 		// add everything to the model
 		this.addToHybridProgram(smallStepAndEpsilonAssignment);
 		this.addToHybridProgram(contractGhostAssignments);
@@ -113,23 +109,20 @@ public class TransformedDLModel extends DLModelDefaultStructure {
 		this.addToHybridProgram(discreteBehavior);
 		this.addToHybridProgram(discreteOutputBehavior);
 		this.addToHybridProgram(continousBehavior); //this will remain empty until the model is finalized and the evolutions from continuousEvolutionHandler are added
+		this.addToHybridProgram(contractContinousGhostAssignment);
 		this.addToHybridProgram(continousOutputBehavior);
 		this.addToHybridProgram(continuousContractAssignments);
 		this.addToHybridProgram(continuousContractTests);
 		this.addToHybridProgram(continuousInputBehavior);
 		this.addToHybridProgram(continuousInputTests);
-	}
-
-	public void addInitialCondition(Relation initCondition) {
-		initialConditions.addElement(initCondition);
-		
+		addSimClock();
 	}
 	
 	public void addToSmallstepReset(HybridProgram hp) {
 		smallStepAndEpsilonAssignment.addElement(hp);
 	}
 
-	public void addSimClock(DLModelDefaultStructure model) {
+	private void addSimClock() {
 		simClock = new Variable("R", "simTime");
 		addInitialCondition(new Relation(simClock, RelationType.EQUAL, new RealTerm(0.0)));
 		addVariable(simClock);
@@ -193,10 +186,6 @@ public class TransformedDLModel extends DLModelDefaultStructure {
 		handleUnsortedOutputs();
 		expandVectors();
 		environment.finalizeEnvironment();
-		
-		if(concurrentContracts!=null) {
-			//concurrentContracts.addToModelHandler(this);
-		}
 		
 		continousBehavior.addElement(continuousEvolutionHandler.asHybridProgram());
 
@@ -340,7 +329,7 @@ public class TransformedDLModel extends DLModelDefaultStructure {
 						newMacros.addAll(newMacrosThisIteration);
 						
 						for(Macro mac : newMacrosThisIteration) {
-							System.out.println("\tresulting macro: "+mac.getClass().toString().replace("class simulink2dl.transform.macro.","")+": " + mac.toString());
+							PluginLogger.debug("\tresulting macro: "+mac.getClass().toString().replace("class simulink2dl.transform.macro.","")+": " + mac.toString());
 						}	
 					}
 				}
@@ -365,13 +354,7 @@ public class TransformedDLModel extends DLModelDefaultStructure {
 		}
 	}
 
-	public void addContractBehavior(HybridProgram newContractBehavior) {
-		contractBehavior.addElement(newContractBehavior);
-	}
 
-	public HybridProgramCollection getContractBehavior() {
-		return contractBehavior;
-	}
 
 	/**
 	 * Returns a behavior block for discrete behavior with the given step size. If
@@ -393,13 +376,6 @@ public class TransformedDLModel extends DLModelDefaultStructure {
 		TimedBehaviorHandler newBehavior = new TimedBehaviorHandler(stepSize);
 		timedBehaviorHandlers.add(newBehavior);
 		return newBehavior;
-	}
-	
-	public ConcurrentContractBehavior getConcurrentContractBehavior() {
-		if(concurrentContracts == null) {
-			concurrentContracts = new ConcurrentContractBehavior();
-		}
-		return concurrentContracts;
 	}
 
 	/**
@@ -445,10 +421,6 @@ public class TransformedDLModel extends DLModelDefaultStructure {
 	public void addConjunctionToAllEvolutionDomains(Formula evolutionDomain) {
 		continuousEvolutionHandler.addConjunctionToAllEvolutionDomains(evolutionDomain);
 	}
-	
-	public void addContracts(List<HybridContract> contracts2) {
-		contracts.addAll(contracts2);
-	}
 
 	public void addRLContractsToModel(List<HybridContract> contracts){
 		rLContracts.addAll(contracts);
@@ -471,8 +443,13 @@ public class TransformedDLModel extends DLModelDefaultStructure {
 	}
 	
 	public void addGhostAssignment(HybridProgram inputProgram) {
-		continuousInputBehavior.addElement(inputProgram);
+		contractGhostAssignments.addElement(inputProgram);
 	}
+	
+	public void addContinuousGhostAssignment(HybridProgram inputProgram) {
+		contractContinousGhostAssignment.addElement(inputProgram);
+	}
+	
 	
 	public void addContinuousContractAssignment(HybridProgram inputProgram) {
 		continuousContractAssignments.addElement(inputProgram);

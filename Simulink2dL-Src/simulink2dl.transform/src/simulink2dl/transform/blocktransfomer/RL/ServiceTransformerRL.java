@@ -64,7 +64,7 @@ import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLWaterDistAgen
 import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLWaterDistInfoContract;
 import simulink2dl.transform.Environment;
 import simulink2dl.transform.blocktransformer.ServiceTransformer;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.util.PluginLogger;
 /** Service transformer for the SimulinkRL2dL project.
  * TODO: Rework contract implementation.
@@ -73,7 +73,7 @@ import simulink2dl.util.PluginLogger;
 */
 public class ServiceTransformerRL extends ServiceTransformer {
 	
-	public ServiceTransformerRL(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
+	public ServiceTransformerRL(SimulinkModel simulinkModel, TransformedSimulinkModel dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 	@Override

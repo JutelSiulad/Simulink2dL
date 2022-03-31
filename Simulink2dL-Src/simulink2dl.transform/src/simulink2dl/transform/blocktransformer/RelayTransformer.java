@@ -47,7 +47,7 @@ import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalChoice;
 import simulink2dl.transform.macro.ConditionalMacro;
 import simulink2dl.transform.macro.Macro;
@@ -57,7 +57,7 @@ import simulink2dl.util.parser.StringToTerm;
 
 public class RelayTransformer extends BlockTransformer {
 
-	public RelayTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
+	public RelayTransformer(SimulinkModel simulinkModel, TransformedSimulinkModel dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 

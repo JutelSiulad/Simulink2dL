@@ -39,14 +39,14 @@ import org.conqat.lib.simulink.model.SimulinkOutPort;
 import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.VectorSplitMacro;
 import simulink2dl.util.PluginLogger;
 
 public class DemuxTransformer extends BlockTransformer {
 
-	public DemuxTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
+	public DemuxTransformer(SimulinkModel simulinkModel, TransformedSimulinkModel dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 

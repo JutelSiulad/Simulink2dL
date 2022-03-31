@@ -46,14 +46,14 @@ import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.StringTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
 import simulink2dl.util.PluginLogger;
 
 public class RelationalOperatorTransformer extends BlockTransformer {
 
-	public RelationalOperatorTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel,
+	public RelationalOperatorTransformer(SimulinkModel simulinkModel, TransformedSimulinkModel dlModel,
 			Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}

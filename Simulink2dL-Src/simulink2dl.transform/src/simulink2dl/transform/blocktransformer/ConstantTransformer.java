@@ -39,7 +39,7 @@ import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
 import simulink2dl.transform.macro.VectorMacro;
@@ -48,7 +48,7 @@ import simulink2dl.util.parser.StringParser;
 
 public class ConstantTransformer extends BlockTransformer {
 
-	public ConstantTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
+	public ConstantTransformer(SimulinkModel simulinkModel, TransformedSimulinkModel dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 
@@ -68,7 +68,7 @@ public class ConstantTransformer extends BlockTransformer {
 
 		// get constant string
 		String name = block.getParameter("Name");
-		Constant constant = new Constant("Real", name);
+		Constant constant = new Constant("R", name);
 		dlModel.addConstant(constant);
 		
 		String valueString = block.getParameter("Value");

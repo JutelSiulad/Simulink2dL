@@ -28,8 +28,7 @@
  ******************************************************************************/
 package simulink2dl.transform.optimizer;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
 import simulink2dl.dlmodel.hybridprogram.ContinuousEvolution;
 import simulink2dl.dlmodel.hybridprogram.DebugString;
@@ -41,102 +40,86 @@ import simulink2dl.dlmodel.hybridprogram.NondeterministicAssignment;
 import simulink2dl.dlmodel.hybridprogram.NondeterministicChoice;
 import simulink2dl.dlmodel.hybridprogram.NondeterministicRepetition;
 import simulink2dl.dlmodel.hybridprogram.TestFormula;
-import simulink2dl.dlmodel.operator.Operator;
-import simulink2dl.dlmodel.operator.formula.BooleanConstant;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
-import simulink2dl.dlmodel.operator.formula.Disjunction;
 import simulink2dl.dlmodel.operator.formula.Formula;
-import simulink2dl.dlmodel.operator.formula.Implication;
-import simulink2dl.dlmodel.operator.formula.Negation;
-import simulink2dl.dlmodel.operator.formula.Relation;
-import simulink2dl.dlmodel.operator.formula.StringFormula;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalChoice;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalHybridProgram;
 import simulink2dl.util.PluginLogger;
 
-public abstract class Optimizer {
-
-	public void run(TransformedDLModel dLModel) {
-		handleSingleProgram(dLModel.getHybridProgram());
+/**
+ * Main Optimizer for Transformed Hybrid Programs
+ * @author Timm Liebrenz, Julius Adelt
+ *
+ */
+public class Optimizer {
+	
+	// available optimization options - in menu creation (TransformPage - putAvailableOptimizersInTable())
+	public static final String[] optimizations = {"HybridProgramCollectionOptimizer", "FormulaOptimizer", "ContradictionOptimizer", "EvolutionOptimizer", "ConditionalChoiceOptimizer"};
+	private boolean optimizeCollections = false;
+	private boolean optimizeFormulas = false;
+	private boolean optimizeContradiction = false;
+	private boolean optimizeEvolutions = false;
+	private boolean optimizeConditionalChoice = false;
+	
+	public Optimizer(Set<String> optimizations) {
+		if(optimizations.contains("HybridProgramCollectionOptimizer")) {
+			optimizeCollections=true;
+		}
+		if(optimizations.contains("FormulaOptimizer")) {
+			optimizeFormulas=true;
+		}
+		if(optimizations.contains("ContradictionOptimizer")) {
+			optimizeContradiction=true;
+		}
+		if(optimizations.contains("EvolutionOptimizer")) {
+			optimizeEvolutions=false; // always false, currently not supported!
+		}
+		if(optimizations.contains("ConditionalChoiceOptimizer")) {
+			optimizeConditionalChoice=true;
+		}
+	}
+	
+	public void run(TransformedSimulinkModel dLModel) {
+		handleInitialConditions(dLModel);
+		handleHybridProgramCollection(dLModel.getHybridProgram());
 	}
 
+	
+	private Formula handleFormula(Formula formula) {
+		if(optimizeFormulas) {
+			formula = FormulaOptimization.optimize(formula);
+		}
+		return formula;
+	}
+	
 	private void handleSingleProgram(HybridProgram program) {
 		// default hybrid programs
 		if (program instanceof ContinuousEvolution) {
-			ContinuousEvolution continuousEvolution = (ContinuousEvolution) program;
-			// handle formula
-			handleFormula(continuousEvolution.getEvolutionDomain());
-			// handle program
-			handleContinuousEvolution(continuousEvolution);
-			// no recursive call
+			handleContinuousEvolution((ContinuousEvolution) program);
 		} else if (program instanceof DebugString) {
 			// no handling
-			// no recursive call
 		} else if (program instanceof DiscreteAssignment) {
-			// handle program
 			handleDiscreteAssignment((DiscreteAssignment) program);
-			// no recursive call
 		} else if (program instanceof HybridProgramCollection) {
-			// handle program
-			handleCollection((HybridProgramCollection) program);
+			handleHybridProgramCollection((HybridProgramCollection) program);
 		} else if (program instanceof IfStatement) {
-			IfStatement ifStatement = (IfStatement) program;
-			// handle formula
-			handleFormula(ifStatement.getCondition());
-			// handle program
 			handleIfStatement((IfStatement) program);
-			// recursive call for inner programs
-			handleSingleProgram(ifStatement.getIfProgram());
-			if (ifStatement.hasElse()) {
-				handleSingleProgram(ifStatement.getElseProgram());
-			}
 		} else if (program instanceof NondeterministicAssignment) {
-			// handle program
 			handleNondeterministicAssignment((NondeterministicAssignment) program);
-			// no recursive call
 		} else if (program instanceof NondeterministicChoice) {
-			NondeterministicChoice nondetChoice = (NondeterministicChoice) program;
-			// handle program
-			handleNondeterministicChoice(nondetChoice);
-			// recursive call for inner programs
-			for (HybridProgram choice : nondetChoice.getChoices()) {
-				handleSingleProgram(choice);
-			}
+			handleNondeterministicChoice((NondeterministicChoice) program);
 		} else if (program instanceof NondeterministicRepetition) {
-			NondeterministicRepetition nondetRepetition = (NondeterministicRepetition) program;
-			// handle program
-			handleNondeterministicRepetition(nondetRepetition);
-			// recursive call for inner program
-			handleSingleProgram(((NondeterministicRepetition) program).getInnerProgram());
+			handleNondeterministicRepetition((NondeterministicRepetition) program);
 		} else if (program instanceof TestFormula) {
-			TestFormula testFormula = (TestFormula) program;
-			// handle formula
-			handleFormula(testFormula.getFormula());
-			// handle program
-			handleTestFormula(testFormula);
-			// no recursive call
+			handleTestFormula((TestFormula) program);
 		} else
-
 		// special hybrid programs
 		if (program instanceof ConditionalChoice) {
-			ConditionalChoice conditionalChoice = (ConditionalChoice) program;
-			// handle program
-			handleConditionalChoice(conditionalChoice);
-			// recursive call for inner programs
-			for (HybridProgram choice : conditionalChoice.getChoices()) {
-				handleSingleProgram(choice);
-			}
+			handleConditionalChoice((ConditionalChoice)program);
 		} else if (program instanceof ConditionalHybridProgram) {
-			ConditionalHybridProgram conditionalHybridProgram = (ConditionalHybridProgram) program;
-			// handle formula
-			handleFormula(conditionalHybridProgram.getCondition());
-			// handle program
-			handleConditionalHybridProgram(conditionalHybridProgram);
-			// recursive call for inner program
-			handleSingleProgram(conditionalHybridProgram.getInnerProgram());
+			handleConditionalHybridProgram((ConditionalHybridProgram) program);
 		} else
-
 		// error case, not handled instance of a hybrid program
 		{
 			PluginLogger
@@ -144,226 +127,88 @@ public abstract class Optimizer {
 		}
 	}
 
-	private void handleFormula(Formula formula) {
-		// default formulas
-		if (formula instanceof Conjunction) {
-			Conjunction conjunction = (Conjunction) formula;
-			
-			
-			// recursive call
-			for (Operator elementOperator : conjunction.getElements()) {
-				Formula element = (Formula) elementOperator;
-				handleFormula(element);
-			}
-			// handle formula
-			handleConjunctionFormula(conjunction);
-		} else if (formula instanceof Disjunction) {
-			Disjunction disjunction = (Disjunction) formula;
-			// recursive call
-			for (Operator elementOperator : disjunction.getElements()) {
-				Formula element = (Formula) elementOperator;
-				handleFormula(element);
-			}
-			// handle formula
-			handleDisjunctionFormula(disjunction);
-		} else if (formula instanceof Negation) {
-			Negation negation = (Negation) formula;
-			// recursive call
-			handleFormula((Formula) negation.getInnerFormula());
-			// handle formula
-			handleNegationFormula(negation);
-		} else if (formula instanceof Relation) {
-			// no recursive call
-			// handle formula
-			handleRelationFormula((Relation) formula);
-		} else if (formula instanceof BooleanConstant) {
-			// no recursive call
-			// no handling
-		} else if (formula instanceof StringFormula) {
-			// no recursive call
-			// no handling
-		} else
+	private void handleInitialConditions(TransformedSimulinkModel dLModel) {
+		Formula initCondition = dLModel.getInitialCondition();
+		initCondition = handleFormula(initCondition);
+		if(!(initCondition instanceof Conjunction)) {
+			initCondition = new Conjunction(initCondition);
+		}
+		dLModel.setInitialCondition((Conjunction) initCondition);
+	}
+	
+	private void handleIfStatement(IfStatement ifStatement) {
+		// handle formula
+		ifStatement.setCondition(handleFormula(ifStatement.getCondition()));
+		// recursive call for inner programs
+		handleSingleProgram(ifStatement.getIfProgram());
+		if (ifStatement.hasElse()) {
+			handleSingleProgram(ifStatement.getElseProgram());
+		}
+	}
 
-		// error case, not handled instance of a formula
-		{
-			PluginLogger.error("Formula of type \"" + formula.getClass().getName() + "\" not handled in optimizer.");
+	private void handleDiscreteAssignment(DiscreteAssignment program) {
+		// do nothing
+	}
+
+	private void handleNondeterministicAssignment(NondeterministicAssignment nondetAssignment) {
+		// do nothing
+	}
+
+	private void handleNondeterministicChoice(NondeterministicChoice nondetChoice) {
+		// recursive call for inner programs
+		for (HybridProgram choice : nondetChoice.getChoices()) {
+			handleSingleProgram(choice);
 		}
 	}
 	
-	protected void handleContinuousEvolution(ContinuousEvolution conEvolution) {
-		// do nothing
+	private void handleContinuousEvolution(ContinuousEvolution evolution) {
+		Formula newDomain = handleFormula(evolution.getEvolutionDomain());
+		evolution.setEvolutionDomain(newDomain);
+		if(optimizeEvolutions) {
+			EvolutionDomainOptimization.optimize(evolution);
+		}
 	}
 
-	protected void handleDiscreteAssignment(DiscreteAssignment disAssignment) {
-		// do nothing
+	private void handleNondeterministicRepetition(NondeterministicRepetition nondetRepetition) {
+		handleSingleProgram(nondetRepetition.getInnerProgram());
 	}
 
-	protected void handleCollection(HybridProgramCollection hpCollection) {
-		
-		simplifyTriviallyTrueConditionalProgram(hpCollection);
-		
-		simplifyTriviallyTrueConditionalChoice(hpCollection);
-		
-		removeTrivialTests(hpCollection);
-		
-		trimCollection(hpCollection);
-		
-		mergeConditionalHybridPrograms(hpCollection);
+	private void handleTestFormula(TestFormula testFormula) {
+		Formula test = handleFormula(testFormula.getFormula());
+		testFormula.setFormula(test);
+	}
+
+	private void handleConditionalHybridProgram(ConditionalHybridProgram conditionalHybridProgram) {
+		Formula newCondition = handleFormula(conditionalHybridProgram.getCondition());
+		conditionalHybridProgram.setCondition(newCondition);
+		// recursive call
+		handleSingleProgram(conditionalHybridProgram.getInnerProgram());
+	}
+
+	private void handleHybridProgramCollection(HybridProgramCollection hpCollection) {
 		//recursive call for inner programs
-		for (HybridProgram program : hpCollection.getInnerPrograms(new LinkedList<HybridProgram>())) {
+		for (HybridProgram program : hpCollection.getSequence()) {
 			handleSingleProgram(program);
 		}
-		
-		
+		if(optimizeCollections) {
+			//handleCollection(hpCollection);
+			CollectionOptimization.optimize(hpCollection);
+		}
+
 	}
 	
-	protected void simplifyTriviallyTrueConditionalProgram(HybridProgramCollection hpCollection) {
-		List<HybridProgram> hps = hpCollection.getSequence();
-		for (int i = 0; i<hps.size(); i++) {
-			HybridProgram hp = hps.get(i);
-			if(hp instanceof ConditionalHybridProgram) {
-				if(FormulaOptimizer.isTriviallyTrue(((ConditionalHybridProgram)hp).getCondition())) {
-					hps.set(i, ((ConditionalHybridProgram)hp).getInnerProgram());
-				}
-			}
+	private void handleConditionalChoice(ConditionalChoice conditionalChoice) {
+		if(optimizeConditionalChoice) {
+			ConditionalChoiceOptimization.optimize(conditionalChoice);
 		}
-	}
-	
-	protected void simplifyTriviallyTrueConditionalChoice(HybridProgramCollection hpCollection) {
-		List<HybridProgram> hps = hpCollection.getSequence();
-		for (int i = 0; i<hps.size(); i++) {
-			HybridProgram hp = hps.get(i);
-			if(hp instanceof ConditionalChoice) {
-				ConditionalChoice condChoice = (ConditionalChoice)hp;
-				if(condChoice.getChoices().size()==1) {
-					ConditionalHybridProgram onlyChoice = condChoice.getChoices().get(0);
-					if(FormulaOptimizer.isTriviallyTrue(onlyChoice.getCondition())) {
-						hps.set(i, onlyChoice.getInnerProgram());
-					}
-				}
-			}
-		}
-	}
-	
-	protected void trimCollection(HybridProgramCollection hpCollection) {
-		List<HybridProgram> collectionSequence = hpCollection.getSequence();
-		
-		for(int i = 0; i<collectionSequence.size(); i++) {
-			if(collectionSequence.get(i) instanceof HybridProgramCollection) {
-				List<HybridProgram> nestedSequence = ((HybridProgramCollection)collectionSequence.get(i)).getSequence();
-				if(nestedSequence.size()==1) {
-					collectionSequence.set(i, nestedSequence.get(0));
-				}
-			}
+		if(optimizeContradiction) {
+			ContradictionOptimization.optimize(conditionalChoice);
 		}
 		
-		for(int i = 0; i<collectionSequence.size(); i++) {
-			HybridProgram hp = collectionSequence.get(i);
-			if(hp instanceof HybridProgramCollection) {
-				HybridProgramCollection innerProgram = (HybridProgramCollection) hp;
-				if(innerProgram.isEmpty()) {
-					collectionSequence.remove(i);
-					i--;
-				}
-			}
+		// recursive call for inner programs
+		for (HybridProgram choice : conditionalChoice.getChoices()) {
+			handleSingleProgram(choice);
 		}
-	}
-
-	protected void removeTrivialTests(HybridProgramCollection hpCollection) {
-		List<HybridProgram> hps = hpCollection.getSequence();
-		for(int i = 0; i<hps.size();i++) {
-			HybridProgram hp = hps.get(i);
-			if(hp instanceof TestFormula) {
-				Formula test = ((TestFormula)hp).getFormula();
-				if(FormulaOptimizer.isTriviallyTrue(test)) {
-					hps.remove(i);
-					i--;
-				}
-			}
-		}
-	}
-	
-	// merges successive conditional choice programs if tests are equal TODO: check if bound variables are influenced
-	protected void mergeConditionalHybridPrograms(HybridProgramCollection hpCollection) {
-		List<HybridProgram> hps = hpCollection.getSequence();
-		for(int i = 0; i<hps.size()-1;i++) {
-			HybridProgram currentHP = hps.get(i);
-			HybridProgram nextHP = hps.get(i+1);
-			if(currentHP instanceof ConditionalChoice && nextHP instanceof ConditionalChoice) {
-				ConditionalChoice currentConditionalChoice = (ConditionalChoice) currentHP;
-				ConditionalChoice nextConditionalChoice = (ConditionalChoice) nextHP;
-				List<ConditionalHybridProgram> currentChoices = currentConditionalChoice.getChoices();
-				List<ConditionalHybridProgram> nextChoices = nextConditionalChoice.getChoices();
-				boolean equal = true;
-				if(!(currentChoices.size()==nextChoices.size())) {
-					equal = false;
-				} else {
-					for(int j = 0; j<currentChoices.size(); j++) {
-						ConditionalHybridProgram currentChoice = currentChoices.get(j);
-						ConditionalHybridProgram nextChoice = nextChoices.get(j);
-						if(!currentChoice.getCondition().equals(nextChoice.getCondition())) {
-							equal = false;
-						}
-					}
-				}
-				if(equal) {
-					for(int j = 0; j<currentChoices.size(); j++) {
-						ConditionalHybridProgram currentChoice = currentChoices.get(j);
-						ConditionalHybridProgram nextChoice = nextChoices.get(j);
-						HybridProgramCollection newHP = new HybridProgramCollection();
-						newHP.addElement(currentChoice.getInnerProgram());
-						newHP.addElement(nextChoice.getInnerProgram());
-						currentChoice.setInnerProgram(newHP);
-					}
-					hps.remove(i+1);
-					i--;
-				}
-			}
-		}
-	}
-
-	protected void handleIfStatement(IfStatement ifStatement) {
-		// do nothing
-	}
-
-	protected void handleNondeterministicAssignment(NondeterministicAssignment nondetAssignment) {
-		// do nothing
-	}
-
-	protected void handleNondeterministicChoice(NondeterministicChoice nondetChoice) {
-		// do nothing
-	}
-
-	protected void handleNondeterministicRepetition(NondeterministicRepetition nondetRepetition) {
-		// do nothing
-	}
-
-	protected void handleTestFormula(TestFormula testFormula) {
-		// do nothing
-	}
-
-	protected void handleConditionalChoice(ConditionalChoice condChoice) {
-		// do nothing
-	}
-
-	protected void handleConditionalHybridProgram(ConditionalHybridProgram condHybridProgram) {
-		// do nothing
-	}
-
-	protected void handleConjunctionFormula(Conjunction conjunction) {
-		// do nothing
-	}
-
-	protected void handleDisjunctionFormula(Disjunction disjunction) {
-		// do nothing
-	}
-
-	protected void handleNegationFormula(Negation negation) {
-		// do nothing
-	}
-
-	protected void handleRelationFormula(Relation relation) {
-		// do nothing
 	}
 
 }

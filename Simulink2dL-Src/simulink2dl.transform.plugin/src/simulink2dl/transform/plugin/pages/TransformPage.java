@@ -59,9 +59,11 @@ import org.eclipse.swt.widgets.TableItem;
 
 import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
 import simulink2dl.transform.Transformer;
-import simulink2dl.transform.optimizer.ConditionalChoiceOptimizer;
-import simulink2dl.transform.optimizer.ContradictionOptimizer;
-import simulink2dl.transform.optimizer.FormulaOptimizer;
+import simulink2dl.transform.optimizer.CollectionOptimization;
+import simulink2dl.transform.optimizer.ConditionalChoiceOptimization;
+import simulink2dl.transform.optimizer.ContradictionOptimization;
+import simulink2dl.transform.optimizer.FormulaOptimization;
+import simulink2dl.transform.optimizer.Optimizer;
 import simulink2dl.transform.plugin.TransformWizard;
 import simulink2dl.util.PluginLogger;
 
@@ -435,11 +437,9 @@ public class TransformPage extends WizardPage {
 
 	private void putAvailableOptimizersInTable(Table tbl, String prefix) {
 
-		putSingleOptimizerInTable(tbl, prefix + ConditionalChoiceOptimizer.class.getSimpleName(), "ConditionalChoice");
-
-		putSingleOptimizerInTable(tbl, prefix + FormulaOptimizer.class.getSimpleName(), "Formula");
-
-		putSingleOptimizerInTable(tbl, prefix + ContradictionOptimizer.class.getSimpleName(), "Contradiction");
+		for(String optimization : Optimizer.optimizations) {
+			putSingleOptimizerInTable(tbl, prefix + optimization, optimization);
+		}
 	}
 
 	private void putSingleOptimizerInTable(Table tbl, String text, String data) {

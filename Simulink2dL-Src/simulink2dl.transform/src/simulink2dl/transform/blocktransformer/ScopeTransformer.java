@@ -39,13 +39,13 @@ import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
 import simulink2dl.dlmodel.term.PortIdentifier;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.util.PluginLogger;
 
 public class ScopeTransformer extends BlockTransformer {
 
-	public ScopeTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
+	public ScopeTransformer(SimulinkModel simulinkModel, TransformedSimulinkModel dlModel, Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}
 

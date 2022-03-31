@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020
+ * Copyright (c) 2020 
  * AG Embedded Systems, University of Münster
  * SESE Software and Embedded Systems Engineering, TU Berlin
  * 
@@ -26,74 +26,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package simulink2dl.dlmodel.hybridprogram;
+package simulink2dl.dlmodel.contracts;
 
-import java.util.List;
-import simulink2dl.dlmodel.operator.formula.Formula;
+import simulink2dl.dlmodel.elements.Variable;
+import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
 import simulink2dl.dlmodel.term.Term;
-
 /**
- * This class represent a test for a given formula.
- * 
- * @author Timm Liebrenz
+ * Variable that acts as a ghost variable for a continuous variable
+ * TODO change name
  *
  */
-public class TestFormula implements HybridProgram {
+public class ContinuousGhostVariable extends GhostVariable {
 
-	private Formula formula;
-
-	/**
-	 * Constructor that takes a formula to test.
-	 * 
-	 * @param formula
-	 */
-	public TestFormula(Formula formula) {
-		this.formula = formula;
+	public ContinuousGhostVariable(String name, Term term) {
+		super(name, term);
 	}
-
-	public Formula getFormula() {
-		return formula;
-	}
-	
-	public void setFormula(Formula formula) {
-		this.formula = formula;
-	}
-
-	@Override
-	public String toString() {
-		return "?(" + formula.toString() + ");";
-	}
-
-	@Override
-	public String toStringFormatted(String indent, boolean multiLineTestFormulas, boolean multiLineEvolutionDomains) {
-		if (multiLineTestFormulas) {
-			return "?(" + formula.toStringFormatted(indent + "  ", multiLineTestFormulas, multiLineEvolutionDomains)
-					+ ");";
-		} else {
-			return toString();
-		}
-	}
-
-	@Override
-	public TestFormula createDeepCopy() {
-		return new TestFormula(formula.createDeepCopy());
-	}
-
-	@Override
-	public HybridProgram expand() {
-		/*formula = formula.expand();*/
-		return this;
-	}
-
-	@Override
-	public List<HybridProgram> getInnerPrograms(List<HybridProgram> hps) {
-		return hps;
-	}
-
-	@Override
-	public List<Term> getInnerTerms(List<Term> terms) {
-		terms.add(formula);
-		return terms;
-	}
-
 }

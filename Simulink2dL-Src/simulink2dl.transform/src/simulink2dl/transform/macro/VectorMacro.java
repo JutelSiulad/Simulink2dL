@@ -31,7 +31,6 @@ package simulink2dl.transform.macro;
 import java.util.LinkedList;
 import java.util.List;
 
-import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.HybridProgramCollection;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.term.ReplaceableTerm;

@@ -127,4 +127,9 @@ public class IfStatement implements HybridProgram {
 		return terms;
 	}
 
+	public void setCondition(Formula condition) {
+		this.condition=condition;
+		
+	}
+
 }

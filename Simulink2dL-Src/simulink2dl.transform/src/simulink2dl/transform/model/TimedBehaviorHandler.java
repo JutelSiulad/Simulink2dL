@@ -36,7 +36,7 @@ import simulink2dl.dlmodel.hybridprogram.HybridProgramCollection;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.operator.formula.Relation.RelationType;
 import simulink2dl.dlmodel.term.RealTerm;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.transform.dlmodel.hybridprogram.ConditionalChoice;
 import simulink2dl.util.parser.StringParser;
 
@@ -114,7 +114,7 @@ public class TimedBehaviorHandler {
 		onStepOutputBehavior.addElementFront(newBehavior);
 	}
 
-	public void addToModel(TransformedDLModel modelHandler) {
+	public void addToModel(TransformedSimulinkModel modelHandler) {
 		addStepClock(modelHandler);
 		addStepTimeReset();
 		addStepBehavior(modelHandler);
@@ -129,7 +129,7 @@ public class TimedBehaviorHandler {
 		}
 	}
 	
-	protected void addStepClock(TransformedDLModel modelHandler) {
+	protected void addStepClock(TransformedSimulinkModel modelHandler) {
 		modelHandler.addVariable(stepClock);
 		modelHandler.addContinuousEvolution(stepClock, new RealTerm(1.0));
 		modelHandler.addConstant(stepSizeConstant);
@@ -142,7 +142,7 @@ public class TimedBehaviorHandler {
 		modelHandler.addInitialCondition(initCondition);
 	}
 	
-	protected void addStepBehavior(TransformedDLModel modelHandler) {
+	protected void addStepBehavior(TransformedSimulinkModel modelHandler) {
 		modelHandler.addTimedOutputBehavior(stepOutputChoice);
 		if(!onStepInternalBehavior.isEmpty()) {
 			modelHandler.addDiscreteBehavior(stepChoice);

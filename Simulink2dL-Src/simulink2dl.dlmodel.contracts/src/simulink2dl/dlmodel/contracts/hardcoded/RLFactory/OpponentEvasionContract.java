@@ -28,6 +28,7 @@
  ******************************************************************************/
 package simulink2dl.dlmodel.contracts.hardcoded.RLFactory;
 
+import simulink2dl.dlmodel.contracts.ContinuousGhostVariable;
 import simulink2dl.dlmodel.contracts.ContinuousHybridContract;
 import simulink2dl.dlmodel.contracts.GhostVariable;
 import simulink2dl.dlmodel.elements.Constant;
@@ -86,7 +87,7 @@ public class OpponentEvasionContract extends ContinuousHybridContract{
 
 			// tDiff = simTime-simTimeOld
 			AdditionTerm tDiffCalc = new AdditionTerm(simTime); tDiffCalc.subtract(simTimeOld);
-			GhostVariable tDiff = new GhostVariable("tDiff", tDiffCalc);
+			ContinuousGhostVariable tDiff = new ContinuousGhostVariable("tDiff", tDiffCalc);
 			ghostVariables.add(tDiff);
 			ghostVariables.add(simTimeOld);
 			

@@ -42,7 +42,7 @@ import org.conqat.lib.simulink.model.SimulinkModel;
 import simulink2dl.transform.Environment;
 import simulink2dl.transform.blocktransfomer.RL.ServiceTransformerRL;
 import simulink2dl.transform.config.TransformerMapping;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.util.PluginLogger;
 
 /**
@@ -68,7 +68,7 @@ public class TransformerFactory {
 	}
 
 	public BlockTransformer getBlockTransformer(SimulinkBlock block, SimulinkModel simulinkModel,
-			TransformedDLModel dlModel, Environment environment) {
+			TransformedSimulinkModel dlModel, Environment environment) {
 		if (block == null) {
 			PluginLogger.error("Invalid block.");
 			return null;
@@ -108,7 +108,7 @@ public class TransformerFactory {
 				Class<? extends BlockTransformer> transformerClass;
 
 				Class<? extends SimulinkModel> smClass = simulinkModel.getClass();
-				Class<? extends TransformedDLModel> dlmClass = dlModel.getClass();
+				Class<? extends TransformedSimulinkModel> dlmClass = dlModel.getClass();
 				Class<? extends Environment> envClass = environment.getClass();
 				try {
 					transformerClass = (Class<? extends BlockTransformer>) Class.forName(transformerClassName);
@@ -146,14 +146,14 @@ public class TransformerFactory {
 	}
 
 	private BlockTransformer createSubSystemTransformer(SimulinkBlock block, SimulinkModel simulinkModel,
-			TransformedDLModel dlModel, Environment environment) {
+			TransformedSimulinkModel dlModel, Environment environment) {
 
 		return new ServiceTransformer(simulinkModel, dlModel, environment);
 
 	}
 
 	public BlockTransformer getBlockTransformerAlternative(String blockName, SimulinkModel simulinkModel,
-			TransformedDLModel dlModel, Environment environment) {
+			TransformedSimulinkModel dlModel, Environment environment) {
 		BlockTransformer t = blockTransformers.get(blockName);
 		if (t == null) {
 			t = createBlockTransformer(blockName, simulinkModel, dlModel, environment);
@@ -162,7 +162,7 @@ public class TransformerFactory {
 	}
 
 	private BlockTransformer createBlockTransformer(String blockType, SimulinkModel simulinkModel,
-			TransformedDLModel dlModel, Environment environment) {
+			TransformedSimulinkModel dlModel, Environment environment) {
 
 		String className = mapping.getMapping(blockType);
 		if (className == null || className == "") {

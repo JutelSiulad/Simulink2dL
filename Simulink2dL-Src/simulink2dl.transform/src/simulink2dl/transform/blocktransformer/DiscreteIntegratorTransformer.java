@@ -46,7 +46,7 @@ import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
 import simulink2dl.transform.model.TimedBehaviorHandler;
@@ -55,7 +55,7 @@ import simulink2dl.util.parser.StringParser;
 
 public class DiscreteIntegratorTransformer extends BlockTransformer {
 
-	public DiscreteIntegratorTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel,
+	public DiscreteIntegratorTransformer(SimulinkModel simulinkModel, TransformedSimulinkModel dlModel,
 			Environment environment) {
 		super(simulinkModel, dlModel, environment);
 	}

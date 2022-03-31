@@ -44,7 +44,7 @@ import simulink2dl.dlmodel.term.RealTerm;
 import simulink2dl.dlmodel.term.ReplaceableTerm;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.transform.Environment;
-import simulink2dl.transform.dlmodel.TransformedDLModel;
+import simulink2dl.transform.dlmodel.TransformedSimulinkModel;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SimpleMacro;
 import simulink2dl.transform.macro.SizePropagationMacro;
@@ -54,7 +54,7 @@ import simulink2dl.util.PluginLogger;
 public abstract class BlockTransformer {
 
 	protected SimulinkModel simulinkModel;
-	protected TransformedDLModel dlModel;
+	protected TransformedSimulinkModel dlModel;
 
 	protected boolean handleControlFlow;
 
@@ -68,7 +68,7 @@ public abstract class BlockTransformer {
 
 	public abstract List<Macro> createMacro(SimulinkBlock block);
 
-	public BlockTransformer(SimulinkModel simulinkModel, TransformedDLModel dlModel, Environment environment) {
+	public BlockTransformer(SimulinkModel simulinkModel, TransformedSimulinkModel dlModel, Environment environment) {
 		this.simulinkModel = simulinkModel;
 		this.dlModel = dlModel;
 		this.environment = environment;
