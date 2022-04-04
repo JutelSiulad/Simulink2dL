@@ -38,11 +38,11 @@ public class RLWaterDistInfoContract extends DiscreteHybridContract {
 	public RLWaterDistInfoContract(String serviceName) {
 		
 		super();
-		
 		Variable Reward = new Variable("R","reward");
 		Variable done = new Variable("R","done");
 		outputs.add(Reward);
 		outputs.add(done);
+		
 		setAssumptionGuaranteePair(new BooleanConstant(true),new BooleanConstant(true));
 	}
 	

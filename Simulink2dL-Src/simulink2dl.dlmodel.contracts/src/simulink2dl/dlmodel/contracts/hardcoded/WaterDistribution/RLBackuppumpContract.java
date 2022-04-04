@@ -1,4 +1,4 @@
-/*******************************************************************************
+/**
  * Copyright (c) 2020
  * AG Embedded Systems, University of Münster
  * SESE Software and Embedded Systems Engineering, TU Berlin
@@ -29,24 +29,35 @@
 package simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution;
 
 import simulink2dl.dlmodel.contracts.DiscreteHybridContract;
+import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.formula.BooleanConstant;
-import simulink2dl.dlmodel.operator.formula.Disjunction;
+import simulink2dl.dlmodel.operator.formula.Conjunction;
+import simulink2dl.dlmodel.operator.formula.Implication;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.term.RealTerm;
 
 
-public class RLPumpContract extends DiscreteHybridContract {
+public class RLBackuppumpContract extends DiscreteHybridContract {
 	/* Simulation Info is transformed to an empty true->true contract */
-	public RLPumpContract(String serviceName) {
+	public RLBackuppumpContract(String serviceName) {
 		
 		super();
+		Variable h = new Variable("R", "h");
+		inputs.add(h);
+		
+		Constant hBackup = new Constant("R", "hBackup");
+		constants.add(hBackup);
+		
 		serviceName=serviceName.replace("RLService", "");
 		serviceName=serviceName.replace("Pump", "");
 		Variable p = new Variable("R", "p"+serviceName);
 		outputs.add(p);
 		
-		setAssumptionGuaranteePair(new BooleanConstant(true),new Disjunction(new Relation(p, EQUAL, new RealTerm(1)), new Relation(p, EQUAL, new RealTerm(0))));
+		Implication aboveBackup = new Implication(new Relation(h, GREATER_THAN, hBackup), new Relation(p, EQUAL, new RealTerm(0)));
+		Implication belowEqualBackup = new Implication(new Relation(h, LESS_EQUAL, hBackup), new Relation(p, EQUAL, new RealTerm(1)));
+		
+		setAssumptionGuaranteePair(new BooleanConstant(true), new Conjunction(aboveBackup, belowEqualBackup));
 	}
 	
 }

@@ -38,10 +38,14 @@ public class RLWaterDistAgentContract extends RLAgentContract {
 	public RLWaterDistAgentContract(String serviceName) {
 		
 		super("TSRL");
-		Variable action = new Variable("R", "action");
-		Variable cReward = new Variable("R", "cReward");
-		outputs.add(action);
-		outputs.add(cReward);
+		Variable a1 = new Variable("R", "a1");
+		Variable a2 = new Variable("R", "a2");
+		Variable a3 = new Variable("R", "a3");
+		Variable dRL = new Variable("R", "dRL");
+		outputs.add(a1);
+		outputs.add(a2);
+		outputs.add(a3);
+		outputs.add(dRL);
 		
 		setAssumptionGuaranteePair(new BooleanConstant(true),new BooleanConstant(true));
 	}
