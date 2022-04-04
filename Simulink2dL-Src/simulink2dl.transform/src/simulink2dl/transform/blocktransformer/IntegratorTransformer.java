@@ -78,7 +78,14 @@ public class IntegratorTransformer extends BlockTransformer {
 
 		// add initial condition
 		String initCondition = block.getParameter("InitialCondition");
-		RealTerm initialValue = new RealTerm(initCondition);
+		RealTerm initialValue;
+		if(initCondition==null) {
+			initialValue = new RealTerm(0);
+			PluginLogger.error("Initial condition of integrator block " + block.getName() + " is null");
+		} else {
+			initialValue = new RealTerm(initCondition);
+		}
+		
 		dlModel.addInitialCondition(new Relation(variable, RelationType.EQUAL, initialValue));
 
 		// get connected port
@@ -96,29 +103,33 @@ public class IntegratorTransformer extends BlockTransformer {
 
 		// check for external reset
 		String externalReset = block.getParameter("ExternalReset");
-
-		switch (externalReset) {
-		case "none":
+		
+		if(externalReset==null) {
 			createEvolutionsWithoutReset(upperLimit, lowerLimit, variable, connectedPortID);
-			break;
-		case "rising":
-			PluginLogger.error("External Reset of type \"" + externalReset + "\" not implemented for Integrator.");
-			break;
-		case "falling":
-			PluginLogger.error("External Reset of type \"" + externalReset + "\" not implemented for Integrator.");
-			break;
-		case "either":
-			PluginLogger.error("External Reset of type \"" + externalReset + "\" not implemented for Integrator.");
-			break;
-		case "level":
-			createEvolutionsLevelReset(block, upperLimit, lowerLimit, variable, initialValue, connectedPortID);
-			break;
-		case "level hold":
-			PluginLogger.error("External Reset of type \"" + externalReset + "\" not implemented for Integrator.");
-			break;
-		default:
-			PluginLogger.error("External Reset of type \"" + externalReset + "\" not implemented for Integrator.");
-			break;
+		} else {
+			switch (externalReset) {
+			case "none":
+				createEvolutionsWithoutReset(upperLimit, lowerLimit, variable, connectedPortID);
+				break;
+			case "rising":
+				PluginLogger.error("External Reset of type \"" + externalReset + "\" not implemented for Integrator.");
+				break;
+			case "falling":
+				PluginLogger.error("External Reset of type \"" + externalReset + "\" not implemented for Integrator.");
+				break;
+			case "either":
+				PluginLogger.error("External Reset of type \"" + externalReset + "\" not implemented for Integrator.");
+				break;
+			case "level":
+				createEvolutionsLevelReset(block, upperLimit, lowerLimit, variable, initialValue, connectedPortID);
+				break;
+			case "level hold":
+				PluginLogger.error("External Reset of type \"" + externalReset + "\" not implemented for Integrator.");
+				break;
+			default:
+				PluginLogger.error("External Reset of type \"" + externalReset + "\" not implemented for Integrator.");
+				break;
+			}
 		}
 	}
 
@@ -242,8 +253,7 @@ public class IntegratorTransformer extends BlockTransformer {
 		DiscreteAssignment resetAssignment = new DiscreteAssignment(variable, initialValue);
 
 		ConditionalHybridProgram resetChoice = new ConditionalHybridProgram(resetCondition, resetAssignment);
-		ConditionalHybridProgram noResetChoice = new ConditionalHybridProgram(noResetCondition,
-				new HybridProgramCollection());
+		ConditionalHybridProgram noResetChoice = new ConditionalHybridProgram(noResetCondition, new HybridProgramCollection());
 		ConditionalChoice resetChoiceProgram = new ConditionalChoice(resetChoice, noResetChoice);
 
 		dlModel.addToHybridProgram(resetChoiceProgram);

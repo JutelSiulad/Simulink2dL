@@ -28,10 +28,8 @@
  ******************************************************************************/
 package simulink2dl.transform.blocktransfomer.RL;
 
-
 import java.util.LinkedList;
 import java.util.List;
-
 
 import org.conqat.lib.simulink.model.SimulinkModel;
 
@@ -57,9 +55,10 @@ import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.RewardContract;
 import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.RobotRLAgentContract;
 import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.RobotSensorContractCreator;
 import simulink2dl.dlmodel.contracts.hardcoded.RLFactory.VelocityAdjustorContract1;
+import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLBackuppumpContract;
+import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLFlowCalculationService;
 import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLPumpContract;
 import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLScopesContract;
-import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLWDistInFlowContract;
 import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLWaterDistAgentContract;
 import simulink2dl.dlmodel.contracts.hardcoded.WaterDistribution.RLWaterDistInfoContract;
 import simulink2dl.transform.Environment;
@@ -124,16 +123,18 @@ public class ServiceTransformerRL extends ServiceTransformer {
 			contracts.add(new EvasiveMoveChooserContract(serviceName));
 		} else if (serviceName.endsWith("RLInfo")) {
 			contracts.add(new RLInfoContract(serviceName));
-		} else if (serviceName.endsWith("Pump")) {
-			contracts.add(new RLPumpContract(serviceName));
-		} else if (serviceName.endsWith("WDistInfo")) {
+		} else if (serviceName.endsWith("WaterDistInfo")) {
 			contracts.add(new RLWaterDistInfoContract(serviceName));
 		} else if (serviceName.endsWith("WDistScopes")) {
 			contracts.add(new RLScopesContract(serviceName));
-		} else if (serviceName.endsWith("WDistAgent")) {
+		} else if (serviceName.endsWith("WaterDistAgent")) {
 			contracts.add(new RLWaterDistAgentContract(serviceName));
-		} else if (serviceName.endsWith("WDistInFlow")) {
-			contracts.add(new RLWDistInFlowContract(serviceName));
+		} else if (serviceName.contains("FlowCalculation")) {
+			contracts.add(new RLFlowCalculationService(serviceName));
+		} else if (serviceName.contains("BackupPump")) {
+			contracts.add(new RLBackuppumpContract(serviceName));
+		} else if (serviceName.contains("RLServicePump")) {
+			contracts.add(new RLPumpContract(serviceName));
 		} else {
 			PluginLogger.error("No contract creation given for service type: " + serviceName);
 			return null;
