@@ -58,15 +58,15 @@ public class RLFlowCalculationService extends DiscreteHybridContract {
 		Variable i = new Variable("R", "i");
 		Variable d = new Variable("R", "d");
 		
-		inputs.add(p1);
-		inputs.add(p2);
-		inputs.add(p3);
-		inputs.add(pb);
+		constants.add(FP);
 		inputs.add(a1);
 		inputs.add(a2);
 		inputs.add(a3);
 		inputs.add(dRL);
-		constants.add(FP);
+		inputs.add(p1);
+		inputs.add(p2);
+		inputs.add(p3);
+		inputs.add(pb);
 		
 		outputs.add(i);
 		outputs.add(d);

@@ -129,6 +129,8 @@ public class StringParser {
 	        Double.parseDouble(toTest);
 	    } catch (NumberFormatException e) {
 	        return false;
+	    } catch (NullPointerException e) {
+	    	return false;
 	    }
 		return true;
 	}

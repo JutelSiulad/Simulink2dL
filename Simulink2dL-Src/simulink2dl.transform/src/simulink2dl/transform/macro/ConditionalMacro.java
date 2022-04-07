@@ -225,30 +225,50 @@ public class ConditionalMacro extends Macro {
 	@Override
 	public void applyToHybridProgramCollection(HybridProgramCollection hybridProgram) {
 		// handle discrete behavior
-		List<HybridProgram> programList = hybridProgram.getInnerPrograms(new LinkedList<HybridProgram>());
-
+		List<HybridProgram> programList = hybridProgram.getSequence();
+		int firstOccurence = -1;
+		int lastOccurence = firstOccurence;
 		for (int i = 0; i < programList.size(); i++) {
 			HybridProgram innerProgram = programList.get(i);
-
 			if (innerProgram.containsTerm(toReplace)) {
+				if(firstOccurence==-1) {
+					firstOccurence=i;
+					
+				}
+				lastOccurence = i;
+			}
+		}
+		
+		if(firstOccurence!=-1) {
+			HybridProgram firstProgram = programList.get(firstOccurence);
+			if(firstOccurence==lastOccurence && firstProgram instanceof HybridProgramCollection) {
+					applyToHybridProgramCollection((HybridProgramCollection) firstProgram);
+			} else {
 				ConditionalChoice newProgram = new ConditionalChoice();
+				HybridProgramCollection newCollection = new HybridProgramCollection();
+				for (int i = firstOccurence; i < lastOccurence; i++) {
+					newCollection.addElement(programList.get(i));
+				}
+				for(int i = 0; i<lastOccurence-firstOccurence; i++) {
+					programList.remove(i);
+				}
 				for (MacroContainer container : macroContainers) {
-					// create condition
-					Formula condition = container.getCondition();
+						// create condition
+						Formula condition = container.getCondition();
 
-					// create behavior
-					HybridProgram choiceProgram = innerProgram.createDeepCopy();
+						// create behavior
+						HybridProgram choiceProgram = newCollection.createDeepCopy();
 
-					// replace macro content
-					Term toReplace = container.getMacro().getToReplace();
-					Term replaceWith = container.getMacro().getReplaceWith();
-					choiceProgram.replaceTermRecursive(toReplace, replaceWith);
+						// replace macro content
+						Term toReplace = container.getMacro().getToReplace();
+						Term replaceWith = container.getMacro().getReplaceWith();
+						choiceProgram.replaceTermRecursive(toReplace, replaceWith);
 
-					// add choice to nondeterministic choice
-					newProgram.addChoice(condition, choiceProgram);
+						// add choice to nondeterministic choice
+						newProgram.addChoice(condition, choiceProgram);
 				}
 				// replace old behavior with new choice
-				programList.set(i, newProgram);
+				programList.add(firstOccurence, hybridProgram);
 			}
 		}
 	}

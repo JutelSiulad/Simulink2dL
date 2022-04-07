@@ -117,7 +117,9 @@ public class ServiceTransformer extends BlockTransformer {
 		
 		// replace internal contract variables with inputs from surrounding model
 		applyInputMacros(inputMacros, initConditions, ghostAssignments, continuousGhostAssignments, contractAssignments, contractFormulas);
-		
+//		for(Macro inputMacro : inputMacros) {
+//			dlModel.addMacro(inputMacro);
+//		}
 		//add Variables to model
 		for (Constant constant : constants) {
 			dlModel.addConstant(constant);

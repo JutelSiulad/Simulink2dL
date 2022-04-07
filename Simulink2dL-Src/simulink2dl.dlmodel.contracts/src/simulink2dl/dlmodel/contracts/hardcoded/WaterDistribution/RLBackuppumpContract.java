@@ -33,6 +33,7 @@ import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.operator.formula.BooleanConstant;
 import simulink2dl.dlmodel.operator.formula.Conjunction;
+import simulink2dl.dlmodel.operator.formula.Disjunction;
 import simulink2dl.dlmodel.operator.formula.Implication;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.term.RealTerm;
@@ -54,10 +55,10 @@ public class RLBackuppumpContract extends DiscreteHybridContract {
 		Variable p = new Variable("R", "p"+serviceName);
 		outputs.add(p);
 		
-		Implication aboveBackup = new Implication(new Relation(h, GREATER_THAN, hBackup), new Relation(p, EQUAL, new RealTerm(0)));
+		Implication valueConstraint = new Implication(new BooleanConstant(true), new Disjunction(new Relation(p, EQUAL, new RealTerm(0)), new Relation(p, EQUAL, new RealTerm(1))));
 		Implication belowEqualBackup = new Implication(new Relation(h, LESS_EQUAL, hBackup), new Relation(p, EQUAL, new RealTerm(1)));
 		
-		setAssumptionGuaranteePair(new BooleanConstant(true), new Conjunction(aboveBackup, belowEqualBackup));
+		setAssumptionGuaranteePair(new BooleanConstant(true), new Conjunction(valueConstraint, belowEqualBackup));
 	}
 	
 }
