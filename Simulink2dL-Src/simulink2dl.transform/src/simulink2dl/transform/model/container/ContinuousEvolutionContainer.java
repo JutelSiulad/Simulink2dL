@@ -98,6 +98,7 @@ public class ContinuousEvolutionContainer {
 	
 	public void getBoundVariables(List<Variable> vars) {
 		evolution.getBoundVariables(vars);
+	}
 	public void setCondition(Formula condition) {
 		this.condition = condition;
 	}
