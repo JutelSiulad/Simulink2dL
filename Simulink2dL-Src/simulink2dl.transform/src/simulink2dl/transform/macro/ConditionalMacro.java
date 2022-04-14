@@ -246,11 +246,9 @@ public class ConditionalMacro extends Macro {
 			} else {
 				ConditionalChoice newProgram = new ConditionalChoice();
 				HybridProgramCollection newCollection = new HybridProgramCollection();
-				for (int i = firstOccurence; i < lastOccurence; i++) {
-					newCollection.addElement(programList.get(i));
-				}
-				for(int i = 0; i<lastOccurence-firstOccurence; i++) {
-					programList.remove(i);
+				for (int i = firstOccurence; i <= lastOccurence; i++) {
+					newCollection.addElement(programList.get(firstOccurence));
+					programList.remove(firstOccurence);
 				}
 				for (MacroContainer container : macroContainers) {
 						// create condition
@@ -268,7 +266,7 @@ public class ConditionalMacro extends Macro {
 						newProgram.addChoice(condition, choiceProgram);
 				}
 				// replace old behavior with new choice
-				programList.add(firstOccurence, hybridProgram);
+				programList.add(firstOccurence, newProgram);
 			}
 		}
 	}
