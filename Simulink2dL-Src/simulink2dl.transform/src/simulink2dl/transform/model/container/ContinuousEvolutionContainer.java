@@ -32,6 +32,7 @@ import java.util.List;
 
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.ContinuousEvolution;
+import simulink2dl.dlmodel.operator.formula.Disjunction;
 import simulink2dl.dlmodel.operator.formula.Formula;
 import simulink2dl.dlmodel.term.Term;
 
@@ -97,6 +98,8 @@ public class ContinuousEvolutionContainer {
 	
 	public void getBoundVariables(List<Variable> vars) {
 		evolution.getBoundVariables(vars);
+	public void setCondition(Formula condition) {
+		this.condition = condition;
 	}
 
 }
