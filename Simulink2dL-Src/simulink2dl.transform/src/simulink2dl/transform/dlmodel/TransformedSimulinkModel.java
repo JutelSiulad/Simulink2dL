@@ -48,7 +48,6 @@ import simulink2dl.dlmodel.term.VectorTerm;
 import simulink2dl.transform.Environment;
 import simulink2dl.transform.macro.Macro;
 import simulink2dl.transform.macro.SizePropagationMacro;
-import simulink2dl.transform.model.ConcurrentContractBehavior;
 import simulink2dl.transform.model.ContinuousEvolutionHandler;
 import simulink2dl.transform.model.TimedBehaviorHandler;
 import simulink2dl.transform.model.TimedContractBehavior;

@@ -37,6 +37,8 @@ import org.conqat.lib.simulink.model.SimulinkOutPort;
 
 import simulink2dl.dlmodel.elements.Constant;
 import simulink2dl.dlmodel.elements.Variable;
+import simulink2dl.dlmodel.hybridprogram.DiscreteAssignment;
+import simulink2dl.dlmodel.operator.formula.Conjunction;
 import simulink2dl.dlmodel.operator.formula.Relation;
 import simulink2dl.dlmodel.term.AdditionTerm;
 import simulink2dl.dlmodel.term.PortIdentifier;
@@ -61,11 +63,24 @@ public class SwitchTransformer extends BlockTransformer {
 
 	@Override
 	public void transformBlock(SimulinkBlock block) {
+		//discretize condition
+		Variable switchVar = new Variable("R",block.getName());
+		
+		SimulinkOutPort conditionPort = environment.getConnectedOuputPort(block, 2);
+		String conditionPortID = environment.getPortID(conditionPort);
+		Term inputTerm = new PortIdentifier(conditionPortID);
+
+		DiscreteAssignment switchAss = new DiscreteAssignment(switchVar,inputTerm);
+		dlModel.addDiscreteBehavior(switchAss);
+		
 		List<Macro> macros = createMacro(block);
+
 		// add alternative to model
 		for (Macro macro : macros) {
 			dlModel.addMacro(macro);
 		}
+
+		
 	}
 
 	@Override
@@ -81,24 +96,33 @@ public class SwitchTransformer extends BlockTransformer {
 		String caseFalsePortID = environment.getPortID(casefalsePort);
 		SimulinkOutPort conditionPort = environment.getConnectedOuputPort(block, 2);
 		String conditionPortID = environment.getPortID(conditionPort);
-
+		
 		// get condition
 		Relation testTrue = generateSwitchCondition(conditionPortID, block, simulinkModel);
 		Relation testFalse = testTrue.createNegation(environment.useOverlappingBounds());
+		
+		Variable switchVar = new Variable("R",block.getName());
+		Relation testTrueDiscrete = testTrue.createDeepCopy();
+		testTrueDiscrete.replaceTermRecursive(testTrueDiscrete.getLeftSide(), switchVar);
+		Conjunction testTrueCon = new Conjunction(testTrueDiscrete, testTrue);
+		
+		Relation testFalseDiscrete = testFalse.createDeepCopy();
+		testFalseDiscrete.replaceTermRecursive(testFalseDiscrete.getLeftSide(), switchVar);
+		Conjunction testFalseCon = new Conjunction(testFalseDiscrete, testFalse);
 
 		// TODO implement size propagation for control flow blocks
 		//SizePropagationMacro SizePropagationMacroTrue = new SizePropagationMacro(new ReplaceableTerm(caseTruePortID), environment.getToReplace(block));
 		//dlModel.addMacro(SizePropagationMacroTrue);
 		
 		SimpleMacro macroTrue = new SimpleMacro(environment.getToReplace(block), new PortIdentifier(caseTruePortID));
-		MacroContainer macroContainerTrue = new MacroContainer(macroTrue, testTrue, null);
+		MacroContainer macroContainerTrue = new MacroContainer(macroTrue, testTrueCon, null);
 
 		// TODO implement size propagation for control flow blocks
 		//SizePropagationMacro SizePropagationMacroFalse = new SizePropagationMacro(new ReplaceableTerm(caseFalsePortID), environment.getToReplace(block));
 		//dlModel.addMacro(SizePropagationMacroFalse);
 		
 		SimpleMacro macroFalse = new SimpleMacro(environment.getToReplace(block), new PortIdentifier(caseFalsePortID));
-		MacroContainer macroContainerFalse = new MacroContainer(macroFalse, testFalse, null);
+		MacroContainer macroContainerFalse = new MacroContainer(macroFalse, testFalseCon, null);
 
 		macros.add(new ConditionalMacro(environment.getToReplace(block), macroContainerTrue, macroContainerFalse));
 		return macros;

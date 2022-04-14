@@ -147,58 +147,56 @@ public class ContinuousEvolutionHandler {
 	/**
 	 * getDiscreteContions
 	 */
-	public List<GhostVariable> mergeEvolutions() {
-		List<GhostVariable> discreteControlVariables = new LinkedList<GhostVariable>();
+	public void mergeEvolutions() {
 	// find continuous control decision variables and replace them with discrete variables (better use a switch variable to store value!)
-	for(int i = 0; i<evolutions.size(); i++) {
-		LinkedList<Variable> bvars = new LinkedList<Variable>();
-		evolutions.get(i).getBoundVariables(bvars);
-		List<Variable> condVars = evolutions.get(i).getCondition().getVariables(new LinkedList<Variable>());
-		List<Variable> continuousCondVars = new LinkedList<Variable>();
-		for(Variable conditionalVar : condVars) {
-			for(Variable continuousVar : condVars) {
-				if(conditionalVar.equals(continuousVar)) {
-					continuousCondVars.add(conditionalVar);
-					break;
+//	for(int i = 0; i<evolutions.size(); i++) {
+//		LinkedList<Variable> bvars = new LinkedList<Variable>();
+//		evolutions.get(i).getBoundVariables(bvars);
+//		List<Variable> condVars = evolutions.get(i).getCondition().getVariables(new LinkedList<Variable>());
+//		List<Variable> continuousCondVars = new LinkedList<Variable>();
+//		for(Variable conditionalVar : condVars) {
+//			for(Variable continuousVar : condVars) {
+//				if(conditionalVar.equals(continuousVar)) {
+//					continuousCondVars.add(conditionalVar);
+//					break;
+//				}
+//			}
+//		}
+//		for(Variable var : continuousCondVars) {
+//			GhostVariable gVar = new GhostVariable(var);
+//			discreteControlVariables.add(gVar);
+//			Formula conditionReplaced = evolutions.get(i).getCondition().createDeepCopy();
+//			conditionReplaced.replaceTermRecursive(var, gVar);
+//			Conjunction newDomain = new Conjunction(evolutions.get(i).getCondition(), conditionReplaced);
+//			evolutions.get(i).setCondition(newDomain);
+//			evolutions.get(i).getEvolution().setEvolutionDomain(newDomain);
+//		}
+//	}
+//	// merge continuous evolutions that are equal
+		for (int i = 0; i<evolutions.size(); i++) {
+			ContinuousEvolution evoi = evolutions.get(i).getEvolution();
+			for(int j = i+1; j<evolutions.size(); j++) {
+				ContinuousEvolution evoj = evolutions.get(j).getEvolution();
+				List<DifferentialEquation> formulasi = evoi.getEvolutionFormulas();
+				List<DifferentialEquation> formulasj = evoj.getEvolutionFormulas();
+				boolean equal = true;
+				for(int k = 0; k<formulasi.size(); k++) {
+					DifferentialEquation ik = formulasi.get(k);
+					DifferentialEquation jk = formulasj.get(k);
+					
+					if(!ik.equals(jk)) {
+						equal=false;
+						break;
+					}
+				}
+				if(equal) {
+					evoi.setEvolutionDomain(new Disjunction(evoi.getEvolutionDomain(), evoj.getEvolutionDomain()));
+					evolutions.get(i).setCondition(new Disjunction(evolutions.get(i).getCondition(),evolutions.get(j).getCondition()));
+					evolutions.remove(j);
+					j--;
 				}
 			}
 		}
-		for(Variable var : continuousCondVars) {
-			GhostVariable gVar = new GhostVariable(var);
-			discreteControlVariables.add(gVar);
-			Formula conditionReplaced = evolutions.get(i).getCondition().createDeepCopy();
-			conditionReplaced.replaceTermRecursive(var, gVar);
-			Conjunction newDomain = new Conjunction(evolutions.get(i).getCondition(), conditionReplaced);
-			evolutions.get(i).setCondition(newDomain);
-			evolutions.get(i).getEvolution().setEvolutionDomain(newDomain);
-		}
-	}
-	// merge continuous evolutions that are equal
-	for (int i = 0; i<evolutions.size(); i++) {
-		ContinuousEvolution evoi = evolutions.get(i).getEvolution();
-		for(int j = i+1; j<evolutions.size(); j++) {
-			ContinuousEvolution evoj = evolutions.get(j).getEvolution();
-			List<DifferentialEquation> formulasi = evoi.getEvolutionFormulas();
-			List<DifferentialEquation> formulasj = evoj.getEvolutionFormulas();
-			boolean equal = true;
-			for(int k = 0; k<formulasi.size(); k++) {
-				DifferentialEquation ik = formulasi.get(k);
-				DifferentialEquation jk = formulasj.get(k);
-				
-				if(!ik.equals(jk)) {
-					equal=false;
-					break;
-				}
-			}
-			if(equal) {
-				evoi.setEvolutionDomain(new Disjunction(evoi.getEvolutionDomain(), evoj.getEvolutionDomain()));
-				evolutions.get(i).setCondition(new Disjunction(evolutions.get(i).getCondition(),evolutions.get(j).getCondition()));
-				evolutions.remove(j);
-				j--;
-			}
-		}
-	}
-	return discreteControlVariables;
 	}
 
 	/**
