@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import simulink2dl.dlmodel.elements.Variable;
+import simulink2dl.dlmodel.operator.formula.Negation;
 import simulink2dl.dlmodel.term.Term;
 import simulink2dl.dlmodel.term.VectorTerm;
 import simulink2dl.util.PluginLogger;
@@ -58,6 +59,24 @@ public class DifferentialEquation implements Term{
 	public DifferentialEquation(Variable variable, Term evolution) {
 		this.variable = variable;
 		this.evolution = evolution;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DifferentialEquation other = (DifferentialEquation) obj;
+		if (variable == null || !variable.equals(other.getVariable())) {
+			return false;
+		}
+		if (evolution == null || !evolution.equals(other.getEvolution())) {
+			return false;
+		}
+		return true;
 	}
 
 	public Variable getVariable() {
