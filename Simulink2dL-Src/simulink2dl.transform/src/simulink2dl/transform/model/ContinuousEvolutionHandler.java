@@ -31,6 +31,7 @@ package simulink2dl.transform.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import simulink2dl.dlmodel.contracts.GhostVariable;
 import simulink2dl.dlmodel.elements.Variable;
 import simulink2dl.dlmodel.hybridprogram.ContinuousEvolution;
 import simulink2dl.dlmodel.hybridprogram.HybridProgram;
@@ -114,7 +115,7 @@ public class ContinuousEvolutionHandler {
 				Conjunction newEvolutionDomain = new Conjunction(newEvolution.getEvolutionDomain().createDeepCopy(),
 						toAddEvolutionDomain.createDeepCopy());
 
-				newEvolution.setEvolutionDomain(newEvolutionDomain);
+				newEvolution.setEvolutionDomain(newEvolutionDomain); 
 
 				for (DifferentialEquation toAddSingleEvolution : toAddEvolution.getEvolutionFormulas()) {
 					newEvolution.addSingleEvolution(toAddSingleEvolution);
@@ -124,6 +125,80 @@ public class ContinuousEvolutionHandler {
 				evolutions.add(new ContinuousEvolutionContainer(newEvolution, newCondition));
 			}
 		}
+	}
+	
+//	/**
+//	 * Adds new continuous evolution to the continuous behavior. Each given element
+//	 * can contain a number of evolution domains and each element can have an
+//	 * individual condition. The new evolution alternatives are added
+//	 * 
+//	 * @param evolution
+//	 */
+//	public void mergeEvolutions() {
+//		for (int i = 0; i<evolutions.size(); i++) {
+//			for (int j = i+1; j<evolutions.size(); j++) {
+//				if (evolutions.get(i).equals(evolutions.get(j)));
+//					evolutions.remove(j);
+//					j--;
+//			}
+//		}
+//	}
+	
+	/**
+	 * getDiscreteContions
+	 */
+	public List<GhostVariable> mergeEvolutions() {
+		List<GhostVariable> discreteControlVariables = new LinkedList<GhostVariable>();
+	// find continuous control decision variables and replace them with discrete variables (better use a switch variable to store value!)
+	for(int i = 0; i<evolutions.size(); i++) {
+		LinkedList<Variable> bvars = new LinkedList<Variable>();
+		evolutions.get(i).getBoundVariables(bvars);
+		List<Variable> condVars = evolutions.get(i).getCondition().getVariables(new LinkedList<Variable>());
+		List<Variable> continuousCondVars = new LinkedList<Variable>();
+		for(Variable conditionalVar : condVars) {
+			for(Variable continuousVar : condVars) {
+				if(conditionalVar.equals(continuousVar)) {
+					continuousCondVars.add(conditionalVar);
+					break;
+				}
+			}
+		}
+		for(Variable var : continuousCondVars) {
+			GhostVariable gVar = new GhostVariable(var);
+			discreteControlVariables.add(gVar);
+			Formula conditionReplaced = evolutions.get(i).getCondition().createDeepCopy();
+			conditionReplaced.replaceTermRecursive(var, gVar);
+			Conjunction newDomain = new Conjunction(evolutions.get(i).getCondition(), conditionReplaced);
+			evolutions.get(i).setCondition(newDomain);
+			evolutions.get(i).getEvolution().setEvolutionDomain(newDomain);
+		}
+	}
+	// merge continuous evolutions that are equal
+	for (int i = 0; i<evolutions.size(); i++) {
+		ContinuousEvolution evoi = evolutions.get(i).getEvolution();
+		for(int j = i+1; j<evolutions.size(); j++) {
+			ContinuousEvolution evoj = evolutions.get(j).getEvolution();
+			List<DifferentialEquation> formulasi = evoi.getEvolutionFormulas();
+			List<DifferentialEquation> formulasj = evoj.getEvolutionFormulas();
+			boolean equal = true;
+			for(int k = 0; k<formulasi.size(); k++) {
+				DifferentialEquation ik = formulasi.get(k);
+				DifferentialEquation jk = formulasj.get(k);
+				
+				if(!ik.equals(jk)) {
+					equal=false;
+					break;
+				}
+			}
+			if(equal) {
+				evoi.setEvolutionDomain(new Disjunction(evoi.getEvolutionDomain(), evoj.getEvolutionDomain()));
+				evolutions.get(i).setCondition(new Disjunction(evolutions.get(i).getCondition(),evolutions.get(j).getCondition()));
+				evolutions.remove(j);
+				j--;
+			}
+		}
+	}
+	return discreteControlVariables;
 	}
 
 	/**

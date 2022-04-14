@@ -185,7 +185,11 @@ public class TransformedSimulinkModel extends DLModelDefaultStructure {
 		applyMacros();
 		handleUnsortedOutputs();
 		expandVectors();
+		
+		continuousEvolutionHandler.mergeEvolutions();
 		environment.finalizeEnvironment();
+		
+		
 		
 		continousBehavior.addElement(continuousEvolutionHandler.asHybridProgram());
 
